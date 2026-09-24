@@ -2,11 +2,15 @@
 set -eu
 
 for file in $(git diff --cached --name-only --diff-filter=ACM); do
-  [ "$file" = ".env.example" ] && continue
-  if git show ":$file" | grep -Eiq '(JWT_(ACCESS|REFRESH)_SECRET|DB_PASSWORD|MYSQL_ROOT_PASSWORD|OAUTH_CLIENT_SECRET)[[:space:]]*[:=][[:space:]]*["'"'][^$][^"'"']+'; then
+  case "$file" in .env.example|.githooks/pre-commit) continue ;; esac
+  if git show ":$file" | grep -Eiq '(JWT_(ACCESS|REFRESH)_SECRET|DB_PASSWORD|MYSQL_ROOT_PASSWORD|OAUTH_CLIENT_SECRET)[[:space:]]*[:=][[:space:]]*[^[:space:]$]+'; then
     printf '%s\n' "Se detectó un secreto potencial en $file. Retíralo antes de confirmar."
     exit 1
   fi
 done
 
-mvn test
+if [ -n "${DB_HOST:-}" ] && [ -n "${DB_NAME:-}" ] && [ -n "${DB_USER:-}" ] && [ -n "${DB_PASSWORD:-}" ]; then
+  TEST_DB_URL="jdbc:mysql://${DB_HOST}:${DB_PORT:-3306}/${DB_NAME}" TEST_DB_USER="$DB_USER" TEST_DB_PASSWORD="$DB_PASSWORD" mvn test
+else
+  mvn test
+fi

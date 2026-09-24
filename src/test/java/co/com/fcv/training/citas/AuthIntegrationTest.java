@@ -20,10 +20,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.UUID;
+import java.util.Set;
 import java.time.Instant;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.spec.SecretKeySpec;
@@ -34,17 +32,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
 @Import(AuthIntegrationTest.RoleProbe.class)
-class AuthIntegrationTest {
-    @Container static final MySQLContainer<?> MYSQL = new MySQLContainer<>("mysql:8.4");
+class AuthIntegrationTest extends DatabaseIntegrationSupport {
     private static final String ACCESS_KEY = UUID.randomUUID().toString() + UUID.randomUUID();
     private static final String REFRESH_KEY = UUID.randomUUID().toString() + UUID.randomUUID();
 
     @DynamicPropertySource static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
-        registry.add("spring.datasource.username", MYSQL::getUsername);
-        registry.add("spring.datasource.password", MYSQL::getPassword);
         registry.add("app.jwt.access-secret", () -> ACCESS_KEY);
         registry.add("app.jwt.refresh-secret", () -> REFRESH_KEY);
         registry.add("app.cookie.secure", () -> true);
@@ -174,6 +167,16 @@ class AuthIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"))
                 .andExpect(header().string("Access-Control-Allow-Credentials", "true"));
+    }
+
+    @Test void schedulingRoutesEnforceUserAdminAndProfessionalRoles() throws Exception {
+        String user = jwt.access(1L, Set.of("USER"));
+        mvc.perform(get("/api/v1/catalogs/locations").header("Authorization", "Bearer " + user)).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/admin/specialties").header("Authorization", "Bearer " + user)).andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/professional/availability-blocks").header("Authorization", "Bearer " + user)).andExpect(status().isForbidden());
+
+        String admin = jwt.access(1L, Set.of("ADMIN"));
+        mvc.perform(get("/api/v1/admin/specialties").header("Authorization", "Bearer " + admin)).andExpect(status().isOk());
     }
 
     @Test void simultaneousRefreshAllowsOnlyOneRotation() throws Exception {
