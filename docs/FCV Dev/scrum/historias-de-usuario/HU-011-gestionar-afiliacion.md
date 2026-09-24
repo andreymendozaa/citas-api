@@ -2,36 +2,36 @@
 id: HU-011
 tipo: historia-de-usuario
 titulo: "Gestionar afiliación"
-estado: Pendiente de aprobación
+estado: Aprobada
 epica: "[[EP-002-identidad-y-perfil-del-usuario]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 2"
-dependencias: ["[[HU-010-gestionar-perfil]]", "[[HU-012-gestionar-eps]]", "[[HU-013-gestionar-planes-eps]]", "[[HU-003-publicar-catalogos-fijos]]"]
+dependencias: ["[[HU-003-publicar-catalogos-fijos]]"]
 relacionadas: []
 ---
 # HU-011 — Gestionar afiliación
 ## Historia de usuario
-**COMO** USER autenticado  
-**QUIERO** asociar mi EPS, plan y régimen mediante una afiliación  
-**PARA** mantener esos datos normalizados en mi cuenta.
+**COMO** visitante que se registra
+**QUIERO** seleccionar opcionalmente un plan activo
+**PARA** guardar una afiliación normalizada como dato administrativo de mi cuenta.
 ## Contexto y descripción
 EPS y planes son configurables; régimen es catálogo fijo.
 ## Alcance
-- Consultar/crear/actualizar afiliación propia con relaciones válidas y sin duplicación interna.
+- Crear una afiliación inicial opcional desde el registro usando un plan activo.
 ## Fuera de alcance
-- Validación real con aseguradoras o duplicar nombres de catálogo en USER/cita.
+- CRUD ADMIN de EPS/planes, gestión posterior de la afiliación y uso de la afiliación en reglas de agenda.
 ## Reglas de negocio
-- No duplicar EPS, régimen ni plan dentro de la afiliación de un usuario; preservar ownership.
+- La afiliación usa FKs; no afecta disponibilidad, precio, aprobación ni reserva.
 ## Dependencias y relaciones
 - Épica: [[EP-002-identidad-y-perfil-del-usuario]]
-- Dependencias: [[HU-010-gestionar-perfil]], [[HU-012-gestionar-eps]], [[HU-013-gestionar-planes-eps]], [[HU-003-publicar-catalogos-fijos]].
+- Dependencias: [[HU-003-publicar-catalogos-fijos]].
 - Relacionadas: Ninguna.
 ## Esfuerzo
 **Nivel:** Medio. **Justificación de dificultad:** enlaza catálogos configurables/fijos, integridad y ownership.
 ## Tareas de desarrollo
-- [ ] **T-01 — Definir representación de afiliación.** Dificultad: Medio. Usar FKs/relaciones normalizadas.
-- [ ] **T-02 — Validar consistencia EPS-plan-régimen.** Dificultad: Alto. Impedir combinaciones inválidas o repetidas.
-- [ ] **T-03 — Entregar flujo propio y pruebas.** Dificultad: Medio. Aplicar ownership y mostrar catálogos activos.
+- [ ] **T-01 — Publicar planes activos.** Dificultad: Medio. Usar la relación normalizada EPS/plan/régimen.
+- [ ] **T-02 — Extender registro opcional.** Dificultad: Alto. Validar plan activo y crear la afiliación sin duplicar textos de catálogo.
+- [ ] **T-03 — Probar selección u omisión.** Dificultad: Medio. La omisión no impide el registro ni afecta agenda.
 ## Criterios de aceptación
 ### CA-01 — Asociación válida
 **Dado** catálogos activos y una combinación válida, **cuando** USER guarda afiliación, **entonces** queda asociada a su perfil.

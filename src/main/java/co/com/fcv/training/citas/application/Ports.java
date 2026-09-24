@@ -29,6 +29,8 @@ public final class Ports {
         boolean matches(String raw, String hash);
     }
 
+    public interface Affiliations { void createCurrent(Long userId, Long planId); }
+
     public record IssuedRefresh(String value, String jti, Instant expiresAt) {}
     public record RefreshIdentity(Long userId, String jti) {}
 

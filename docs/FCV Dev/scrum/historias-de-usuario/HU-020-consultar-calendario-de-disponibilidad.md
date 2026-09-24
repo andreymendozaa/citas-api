@@ -2,7 +2,7 @@
 id: HU-020
 tipo: historia-de-usuario
 titulo: "Consultar calendario de disponibilidad"
-estado: Pendiente de aprobación
+estado: Aprobada
 epica: "[[EP-004-disponibilidad-del-profesional]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 4"

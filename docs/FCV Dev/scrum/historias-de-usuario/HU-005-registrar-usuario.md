@@ -56,12 +56,13 @@ Datos mínimos: nombres, apellidos, tipo/número de documento, email, teléfono 
 | CA-02 | Cumple | `V1__identity.sql` UK email/documento; `AuthIntegrationTest.registrationUsesUniqueIdentityAndBcrypt` | 409 sin segunda cuenta. |
 | CA-03 | Cumple | `AuthController.RegisterRequest`, `Identity.email`, `AuthIntegrationTest.registrationUsesUniqueIdentityAndBcrypt` | Campo obligatorio ausente, email inválido y password fuera del límite técnico producen 400. |
 | CA-04 | Cumple | `Identity.email`, `Identity.documentType`, `AuthService.register`, `AuthIntegrationTest.registrationUsesUniqueIdentityAndBcrypt` | Normalización, unicidad y BCrypt comprobados. |
-| DoD pruebas | Cumple | `target/surefire-reports/*.txt` | `mvn test`: 8 pruebas, 0 fallos/errores en MySQL 8.4. |
+| DoD pruebas | Cumple | `target/surefire-reports/*.txt` | `mvn test`: 9 pruebas, 0 fallos/errores en MySQL 8.4. |
 | DoD esquema/seguridad | Cumple | `V1__identity.sql`, `data-integrity.md`, `AuthController`, `AuthService` | Flyway 3FN, validación server-side, sin password en respuesta ni logger de credenciales. |
 | DoD trazabilidad | Cumple | Esta HU, HU-033, `contracts.md`, `traceability.md` | UI diferida a HU-033. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
-- 2026-09-17 — Corte backend aprobado, validado y completado con `mvn test` (8/8); tareas de UI movidas a HU-033.
+- 2026-09-17 — Corte backend aprobado, validado y completado con `mvn test`; tareas de UI movidas a HU-033.
+- 2026-09-22 — Verificación cruzada con esquema 3FN existente y cliente React: `mvn test` 9/9.
 ## Notas y decisiones
 - El diseño visual requiere aprobación fuera de esta especificación.
 - 2026-09-17: usuario aprobó el corte backend. Formulario y flujo visual pasan a HU-033; su ausencia no bloquea la DoD backend de HU-005. Documento único por tipo+número, email normalizado sin distinguir mayúsculas. No se implementa registro de otros roles.

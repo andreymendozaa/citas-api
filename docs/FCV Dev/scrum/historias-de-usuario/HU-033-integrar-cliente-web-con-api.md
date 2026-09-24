@@ -2,7 +2,7 @@
 id: HU-033
 tipo: historia-de-usuario
 titulo: "Integrar cliente web con API"
-estado: Pendiente de aprobación
+estado: En progreso
 epica: "[[EP-008-cliente-web-y-automatizaciones-posteriores]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 7"
@@ -15,7 +15,7 @@ relacionadas: []
 **QUIERO** acceder por web a las pantallas obligatorias conectadas directamente a la API  
 **PARA** completar los flujos aprobados del producto.
 ## Contexto y descripción
-La estética se deriva de Stitch/AI Studio; el framework será React o Angular, aún pendiente. Esta HU consolida integración, no duplica reglas backend.
+La estética se deriva del prototipo React/Vite importado desde AI Studio. Esta HU consolida integración, no duplica reglas backend.
 ## Alcance
 - Rutas/pantallas obligatorias de registro, sesión, perfil, disponibilidad/citas, dashboards profesional y ADMIN, y CRUD ADMIN mediante contrato aprobado.
 ## Fuera de alcance
@@ -29,10 +29,10 @@ La estética se deriva de Stitch/AI Studio; el framework será React o Angular, 
 ## Esfuerzo
 **Nivel:** Alto. **Justificación de dificultad:** integra múltiples flujos/roles y depende de decisión visual/framework.
 ## Tareas de desarrollo
-- [ ] **T-01 — Acordar framework/diseño.** Dificultad: Alto. Seguir Stitch → aprobación → AI Studio antes de implementar UI.
-- [ ] **T-02 — Implementar navegación/estado por rol.** Dificultad: Alto. Cubrir pantallas obligatorias y sesión.
-- [ ] **T-03 — Conectar cliente REST.** Dificultad: Alto. Usar contrato versionado, errores y URL de environment, sin BFF.
-- [ ] **T-04 — Verificar cross-repo.** Dificultad: Alto. Ejecutar build/typecheck/pruebas y flujos clave contra API.
+- [x] **T-01 — Acordar framework/diseño.** Dificultad: Alto. Prototipo React/Vite importado; se conserva su composición visual para el corte de autenticación.
+- [ ] **T-02 — Implementar navegación/estado por rol.** Dificultad: Alto. El estado USER de autenticación está integrado; faltan pantallas obligatorias de historias posteriores.
+- [x] **T-03 — Conectar cliente REST.** Dificultad: Alto. Registro, login, refresh y logout consumen el contrato versionado directo, por environment y sin BFF.
+- [x] **T-04 — Verificar cross-repo.** Dificultad: Alto. Typecheck, pruebas, build y flujo visual USER comprobados contra API/MySQL.
 ## Criterios de aceptación
 ### CA-01 — Pantallas obligatorias
 **Dado** el diseño y las HU aprobadas, **cuando** cada rol navega, **entonces** puede llegar a las pantallas obligatorias pertinentes del PRD.
@@ -47,11 +47,13 @@ La estética se deriva de Stitch/AI Studio; el framework será React o Angular, 
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | Requiere diseño/framework. |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | Parcial | `LoginScreen`, `RegisterScreen`, `App`, validación visual 2026-09-22 | Registro, login, restauración y logout USER listos; las demás pantallas dependen de HU posteriores. |
+| CA-02 | Cumple para autenticación | `src/auth/authApi.ts`, `.env.example`, CORS de `SecurityConfig` | REST directo a `/api/v1/auth`, `credentials: include` y `X-Requested-With`; sin Express/BFF. |
+| CA-03 | Cumple para autenticación | `authApi.test.ts`, `authScreens.test.tsx`, validación visual | Access solo en memoria; refresh cookie HttpOnly; errores 400/401/403/409 mapeados sin exponer tokens. |
+| DoD del corte auth | Cumple | `npm run lint`, `npm test` (8/8), `npm run build`; `mvn test` (9/9) | Preflight CORS y login USER comprobados contra MySQL persistente. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-22 — Corte React de autenticación implementado y verificado cross-repo; la HU queda en progreso hasta cubrir las pantallas de sus dependencias posteriores.
 ## Notas y decisiones
-- React o Angular es una decisión abierta; no se toma en esta HU.
+- React + TypeScript + Vite se adopta para este corte a partir del prototipo entregado `portal-de-citas.zip`.
 - 2026-09-17: aquí quedan las tareas visuales diferidas de HU-005/006/007: formulario de registro, feedback de login, renovación desde navegador y limpieza de estado autenticado al salir. Integrar `credentials`, `X-Requested-With` y el contrato de cookie cuando se aborde la UI.

@@ -67,6 +67,15 @@ class AuthIntegrationTest {
         mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON).content(registration(email, doc)))
                 .andExpect(status().isCreated());
     }
+    @Test void registrationCreatesOptionalCurrentInsuranceAffiliation() throws Exception {
+        Long planId = jdbc.queryForObject("select id from eps_plans where active=true limit 1", Long.class);
+        String email = uniqueEmail();
+        String body = mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON).content("""
+                {"firstName":"Ana","lastName":"Plan","documentType":"CC","documentNumber":"%s","email":"%s","phone":"3000000000","password":"SyntheticPass123!","insurancePlanId":%d}
+                """.formatted(uniqueDoc(), email, planId))).andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        Long userId = mapper.readTree(body).get("id").asLong();
+        assertThat(jdbc.queryForObject("select count(*) from user_insurance_affiliations where user_id=? and plan_id=? and is_current=true", Integer.class, userId, planId)).isEqualTo(1);
+    }
     private org.springframework.test.web.servlet.ResultActions login(String email, String password) throws Exception {
         return mvc.perform(post("/api/v1/auth/login").header("X-Requested-With", "XMLHttpRequest")
                 .contentType(MediaType.APPLICATION_JSON).content("""

@@ -2,11 +2,11 @@
 id: HU-021
 tipo: historia-de-usuario
 titulo: "Buscar disponibilidad"
-estado: Pendiente de aprobación
+estado: Aprobada
 epica: "[[EP-005-busqueda-y-reserva-de-citas]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 4"
-dependencias: ["[[HU-011-gestionar-afiliacion]]", "[[HU-014-gestionar-especialidades-y-duracion]]", "[[HU-016-asignar-especialidades-al-profesional]]", "[[HU-018-crear-bloques-de-disponibilidad]]"]
+dependencias: ["[[HU-014-gestionar-especialidades-y-duracion]]", "[[HU-016-asignar-especialidades-al-profesional]]", "[[HU-018-crear-bloques-de-disponibilidad]]"]
 relacionadas: ["[[HU-022-reservar-cita-general]]", "[[HU-023-solicitar-cita-especializada]]"]
 ---
 # HU-021 — Buscar disponibilidad
@@ -24,7 +24,7 @@ Solo se muestran horarios que permiten todos los slots necesarios; tipo general/
 - 60 min requiere dos slots consecutivos; profesional debe estar habilitado/asociado y especialidad activa.
 ## Dependencias y relaciones
 - Épica: [[EP-005-busqueda-y-reserva-de-citas]]
-- Dependencias: [[HU-011-gestionar-afiliacion]], [[HU-014-gestionar-especialidades-y-duracion]], [[HU-016-asignar-especialidades-al-profesional]], [[HU-018-crear-bloques-de-disponibilidad]].
+- Dependencias: [[HU-014-gestionar-especialidades-y-duracion]], [[HU-016-asignar-especialidades-al-profesional]], [[HU-018-crear-bloques-de-disponibilidad]].
 - Relacionadas: [[HU-022-reservar-cita-general]], [[HU-023-solicitar-cita-especializada]].
 ## Esfuerzo
 **Nivel:** Alto. **Justificación de dificultad:** consulta transversal de agenda, oferta, vigencia y slots consecutivos.
@@ -53,3 +53,4 @@ Solo se muestran horarios que permiten todos los slots necesarios; tipo general/
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
 ## Notas y decisiones
 - El tratamiento de concurrencia se prueba definitivamente en las HU de reserva.
+- La afiliación es un dato administrativo opcional y no condiciona búsqueda ni reserva.

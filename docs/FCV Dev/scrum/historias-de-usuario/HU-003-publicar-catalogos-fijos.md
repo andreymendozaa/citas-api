@@ -2,7 +2,7 @@
 id: HU-003
 tipo: historia-de-usuario
 titulo: "Publicar catálogos fijos"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-001-fundacion-y-contrato-del-producto]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 1"

@@ -2,7 +2,7 @@
 id: HU-001
 tipo: historia-de-usuario
 titulo: "Inicializar fundación técnica"
-estado: En desarrollo
+estado: Completada
 epica: "[[EP-001-fundacion-y-contrato-del-producto]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 1"
@@ -30,10 +30,10 @@ El repositorio parte sin aplicación. Esta HU funda backend y cliente elegible s
 ## Esfuerzo
 **Nivel:** Alto. **Justificación de dificultad:** establece límites transversales sin implementación existente.
 ## Tareas de desarrollo
-- [ ] **T-01 — Inicializar backend requerido.** Dificultad: Alto. Crear estructura que conserve dominio/aplicación independiente de adaptadores.
-- [ ] **T-02 — Preparar configuración segura.** Dificultad: Medio. Externalizar secretos y habilitar CORS explícito/health recomendado.
-- [ ] **T-03 — Inicializar cliente TypeScript aprobado.** Dificultad: Medio. Configurar URL de API por environment, sin Express/BFF.
-- [ ] **T-04 — Añadir verificación base.** Dificultad: Medio. Registrar build/typecheck y pruebas aplicables sin secretos.
+- [x] **T-01 — Inicializar backend requerido.** Dificultad: Alto. Crear estructura que conserve dominio/aplicación independiente de adaptadores.
+- [x] **T-02 — Preparar configuración segura.** Dificultad: Medio. Externalizar secretos y habilitar CORS explícito/health recomendado.
+- [x] **T-03 — Inicializar cliente TypeScript aprobado.** Dificultad: Medio. React/Vite importado desde el prototipo Stitch aprobado; URL de API por environment y sin Express/BFF.
+- [x] **T-04 — Añadir verificación base.** Dificultad: Medio. Build, typecheck y pruebas del stack aplicables.
 ## Criterios de aceptación
 ### CA-01 — Stack verificable
 **Dado** el repositorio inicial, **cuando** se inspecciona la configuración, **entonces** se evidencia Java 21, Spring Boot 3.5.x, Maven y cliente TypeScript con framework aprobado.
@@ -42,18 +42,18 @@ El repositorio parte sin aplicación. Esta HU funda backend y cliente elegible s
 ### CA-03 — Configuración segura
 **Dado** una ejecución de desarrollo, **cuando** se revisan configuración y ejemplos, **entonces** no hay secretos reales y la URL backend es configurable.
 ## Definition of Done
-- [ ] CA-01 a CA-03 tienen evidencia de repositorio.
-- [ ] Hay build/typecheck y pruebas base aplicables con resultado disponible.
-- [ ] No se introdujo Express/BFF, credenciales ni datos no sintéticos.
-- [ ] La trazabilidad Scrum está actualizada.
+- [x] CA-01 a CA-03 tienen evidencia de repositorio.
+- [x] Hay build/typecheck y pruebas base aplicables con resultado disponible.
+- [x] No se introdujo Express/BFF, credenciales ni datos no sintéticos.
+- [x] La trazabilidad Scrum está actualizada.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | Cumple | `citas-api/pom.xml`, `citas-web/package.json`, ramas `main` y `develop` | Java 21, Spring Boot 3.5, Maven y React/TypeScript verificables. |
+| CA-02 | Cumple | `citas-api/src/main/java`, AGENTS de ambos repositorios | Separación dominio/aplicación/adaptadores y REST directo. |
+| CA-03 / DoD | Cumple | `.env.example`, configuración CORS, Docker funcional y pruebas base | Sin secretos versionados; estilo Stitch aprobado como referencia visual. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-22 — Cierre S2 confirmado: infraestructura, ramas, cliente React/Vite y estilo Stitch quedan establecidos.
 ## Notas y decisiones
-- React o Angular sigue pendiente de selección a partir de Stitch/AI Studio.
-- 2026-09-17: aprobado y en desarrollo únicamente el corte backend Java/Spring/Maven, configuración externa, CORS y límites hexagonales. Cliente TypeScript, CA-01 y DoD globales permanecen pendientes; esta HU no se declarará completada con el incremento de identidad.
+- React + TypeScript + Vite es el framework aprobado para el proyecto; el diseño Stitch implementado se conserva como fuente visual.
