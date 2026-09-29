@@ -9,8 +9,4 @@ git diff --cached --name-only --diff-filter=ACM | while IFS= read -r file; do
   fi
 done
 
-if [ -n "${DB_HOST:-}" ] && [ -n "${DB_NAME:-}" ] && [ -n "${DB_USER:-}" ] && [ -n "${DB_PASSWORD:-}" ]; then
-  TEST_DB_URL="jdbc:mysql://${DB_HOST}:${DB_PORT:-3306}/${DB_NAME}" TEST_DB_USER="$DB_USER" TEST_DB_PASSWORD="$DB_PASSWORD" mvn test
-else
-  mvn test
-fi
+mvn test
