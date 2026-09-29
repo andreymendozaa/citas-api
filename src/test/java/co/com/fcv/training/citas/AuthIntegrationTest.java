@@ -215,6 +215,10 @@ class AuthIntegrationTest extends DatabaseIntegrationSupport {
                 {"professionalId":%d,"locationId":%d,"specialtyId":%d,"date":"%s","startTime":"08:00","reason":"General"}
                 """.formatted(professional, location, general, date)))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.status").value("APPROVED"));
+        mvc.perform(get("/api/v1/appointments/mine").param("status", "APPROVED").param("date", date.toString()).header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].professionalName").value("Ruta Profesional"))
+                .andExpect(jsonPath("$[0].specialtyName").value("General " + suffix)).andExpect(jsonPath("$[0].durationMinutes").value(30))
+                .andExpect(jsonPath("$[0].status").value("APPROVED"));
         mvc.perform(post("/api/v1/appointments").header("Authorization", "Bearer " + userToken).contentType(MediaType.APPLICATION_JSON).content("""
                 {"professionalId":%d,"locationId":%d,"specialtyId":%d,"date":"%s","startTime":"09:00","reason":"Especializada"}
                 """.formatted(professional, location, specialized, date)))
@@ -224,6 +228,10 @@ class AuthIntegrationTest extends DatabaseIntegrationSupport {
         Long appointment = mapper.readTree(pending).get(0).get("id").asLong();
         mvc.perform(post("/api/v1/admin/appointments/{id}/decision", appointment).header("Authorization", "Bearer " + adminToken).contentType(MediaType.APPLICATION_JSON).content("{" + "\"decision\":\"REJECT\",\"reason\":\"Sin disponibilidad\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("REJECTED"));
+        mvc.perform(get("/api/v1/appointments/mine").param("status", "REJECTED").header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].rejectionReason").value("Sin disponibilidad"));
+        mvc.perform(get("/api/v1/appointments/mine").header("Authorization", "Bearer " + jwt.access(patient + 999L, Set.of("USER"))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
     }
 
     @Test void simultaneousRefreshAllowsOnlyOneRotation() throws Exception {

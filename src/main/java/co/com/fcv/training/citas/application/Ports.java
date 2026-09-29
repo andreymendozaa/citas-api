@@ -53,6 +53,7 @@ public final class Ports {
         void deleteBlock(Long userId, Long id);
         List<SchedulingService.Available> availability(Long locationId, Long specialtyId, Long professionalId, LocalDate date);
         SchedulingService.Appointment reserve(Long userId, Long professionalId, Long locationId, Long specialtyId, LocalDateTime start, String reason);
+        List<SchedulingService.MyAppointment> appointments(Long userId, String status, LocalDate date);
         List<SchedulingService.PendingAppointment> pending();
         SchedulingService.Appointment decide(Long adminId, Long appointmentId, String decision, String reason);
     }

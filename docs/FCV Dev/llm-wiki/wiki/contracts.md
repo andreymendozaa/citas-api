@@ -55,3 +55,7 @@ Todos los recursos S3 usan `/api/v1`, JWT access en `Authorization: Bearer` y JS
 `citas-web` consume las cuatro operaciones de autenticación directamente con `VITE_API_URL` (valor local: `http://localhost:8080`). Envía `credentials: include` y `X-Requested-With: XMLHttpRequest` en login, refresh y logout. El access JWT permanece solo en memoria; el refresh se mantiene en cookie `HttpOnly` y se rota al restaurar la sesión. La interfaz no registra ni muestra tokens o contraseñas.
 
 El CORS permite exclusivamente `FRONTEND_ORIGIN`, métodos `POST`, `GET`, `OPTIONS`, encabezados `Content-Type`, `Authorization`, `X-Requested-With` y credenciales. La base de referencia ya existente utiliza `BIGINT` para usuarios, `roles.code` y `refresh_tokens`; Flyway hace baseline en versión 0 y `V1` es compatible con ese esquema 3FN.
+
+## DECISIÓN — 2026-09-29 · Consulta USER de Mis citas
+
+`GET /api/v1/appointments/mine?status=&date=` es exclusivo de `USER` y obtiene el usuario desde el JWT; no acepta ni expone un identificador de paciente. `status` y `date` (`YYYY-MM-DD`) son opcionales. Cada elemento devuelve `id`, `professionalName`, `specialtyName`, `locationName`, `startAt`, `endAt`, `durationMinutes`, `status` y `rejectionReason` cuando la cita fue rechazada. La consulta se construye sobre las FKs existentes de `appointments`, catálogos y `appointment_status_history`, por lo que no requiere migración ni altera reservas, slots o estados.
