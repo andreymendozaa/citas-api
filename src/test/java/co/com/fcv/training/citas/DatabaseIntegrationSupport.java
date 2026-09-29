@@ -4,7 +4,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 
-/** Uses the compose MySQL during containerized development and Testcontainers elsewhere. */
+/** Uses the isolated compose test database during containerized development and Testcontainers elsewhere. */
 abstract class DatabaseIntegrationSupport {
     private static final boolean USE_EXTERNAL_DATABASE = System.getenv("TEST_DB_URL") != null;
     private static final MySQLContainer<?> MYSQL = USE_EXTERNAL_DATABASE ? null : new MySQLContainer<>("mysql:8.4");
