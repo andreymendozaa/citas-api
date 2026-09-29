@@ -18,7 +18,7 @@ Este mapa convierte el PRD v1 y las restricciones autorizadas en trabajo secuenc
 
 ## Registro S4 — evidencia sin cierre de HU · 2026-09-29
 
-El corte S3 conserva sus rutas y la BD Flyway V1/V2 sin modificación. Las pruebas verificadas son 18 Maven y 16 Vitest, más `npm run lint` y `npm run build`. Se comprobó concurrencia, reglas de slots, aprobación/rechazo e historial, autorizaciones, profesional/sede/especialidad inválidos y contratos de formularios para USER, ADMIN y PROFESSIONAL. Los endpoints de oferta y agenda se consumen desde React sin datos simulados; `GET /admin/professionals` no devuelve datos de acceso. Este registro no marca HU-003, HU-004, HU-011 ni HU-014 a HU-024 como completadas: sus CA/DoD permanecen sujetos a la auditoría integral.
+El corte S3 conserva sus rutas y la BD Flyway V1/V2 sin modificación. Las pruebas verificadas son 19 Maven y 16 Vitest, más `npm run lint` y `npm run build`. Se comprobó concurrencia, reglas de slots, aprobación/rechazo e historial, autorizaciones, profesional/sede/especialidad inválidos, contratos de formularios para USER, ADMIN y PROFESSIONAL, y las rutas S3 de reserva general/especializada y decisión ADMIN mediante MockMvc. Los endpoints de oferta y agenda se consumen desde React sin datos simulados; `GET /admin/professionals` no devuelve datos de acceso. El Verifier reutilizable se aplica justo después de cada Prompt antes de avanzar al siguiente. Este registro no marca HU-003, HU-004, HU-011 ni HU-014 a HU-024 como completadas: sus CA/DoD permanecen sujetos a la auditoría integral.
 
 ## Épicas
 

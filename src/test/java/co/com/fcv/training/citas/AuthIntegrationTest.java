@@ -1,6 +1,7 @@
 package co.com.fcv.training.citas;
 
 import co.com.fcv.training.citas.adapter.security.JwtTokens;
+import co.com.fcv.training.citas.application.SchedulingService;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 import java.util.Set;
-import java.time.Instant;
+import java.time.*;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.concurrent.*;
@@ -48,6 +49,7 @@ class AuthIntegrationTest extends DatabaseIntegrationSupport {
     @Autowired ObjectMapper mapper;
     @Autowired JdbcTemplate jdbc;
     @Autowired JwtTokens jwt;
+    @Autowired SchedulingService scheduling;
 
     private String uniqueEmail() { return "user-" + UUID.randomUUID() + "@example.test"; }
     private String uniqueDoc() { return UUID.randomUUID().toString(); }
@@ -185,6 +187,43 @@ class AuthIntegrationTest extends DatabaseIntegrationSupport {
         String admin = jwt.access(1L, Set.of("ADMIN"));
         mvc.perform(get("/api/v1/admin/specialties").header("Authorization", "Bearer " + admin)).andExpect(status().isOk());
         mvc.perform(get("/api/v1/admin/professionals").header("Authorization", "Bearer " + admin)).andExpect(status().isOk());
+    }
+
+    @Test void s3AppointmentRoutesKeepGeneralAndSpecializedContracts() throws Exception {
+        String suffix = UUID.randomUUID().toString();
+        Long professional = scheduling.createProfessional("Ruta", "Profesional", "CC", "P" + suffix, "route-prof-" + suffix + "@example.test", "3000000000", "hash", "PC" + suffix, "LIC" + suffix);
+        Long owner = jdbc.queryForObject("select user_id from professionals where id=?", Long.class, professional);
+        Long general = scheduling.createSpecialty("GEN" + suffix, "General " + suffix, 30, true).id();
+        Long specialized = scheduling.createSpecialty("ESP" + suffix, "Especializada " + suffix, 60, false).id();
+        Long location = jdbc.queryForObject("select id from locations where active=true limit 1", Long.class);
+        scheduling.setProfessionalSpecialties(professional, java.util.List.of(general, specialized), general);
+        scheduling.setProfessionalLocations(professional, java.util.List.of(location));
+        LocalDate date = LocalDate.now().plusDays(7);
+        scheduling.createBlock(owner, location, date, LocalTime.of(8, 0), LocalTime.of(11, 0));
+
+        String patientEmail = uniqueEmail();
+        jdbc.update("insert into users(first_name,last_name,document_type,document_number,email,phone,password_hash,active,email_verified) values ('Ruta','Paciente','CC',?,?,?,'hash',true,false)", uniqueDoc(), patientEmail, "3000000000");
+        Long patient = jdbc.queryForObject("select id from users where email=?", Long.class, patientEmail);
+        String adminEmail = uniqueEmail();
+        jdbc.update("insert into users(first_name,last_name,document_type,document_number,email,phone,password_hash,active,email_verified) values ('Ruta','Admin','CC',?,?,?,'hash',true,false)", uniqueDoc(), adminEmail, "3000000000");
+        Long admin = jdbc.queryForObject("select id from users where email=?", Long.class, adminEmail);
+        String userToken = jwt.access(patient, Set.of("USER")); String adminToken = jwt.access(admin, Set.of("ADMIN"));
+
+        mvc.perform(get("/api/v1/availability").param("locationId", location.toString()).param("specialtyId", general.toString()).param("date", date.toString()).header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].professionalId").value(professional));
+        mvc.perform(post("/api/v1/appointments").header("Authorization", "Bearer " + userToken).contentType(MediaType.APPLICATION_JSON).content("""
+                {"professionalId":%d,"locationId":%d,"specialtyId":%d,"date":"%s","startTime":"08:00","reason":"General"}
+                """.formatted(professional, location, general, date)))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.status").value("APPROVED"));
+        mvc.perform(post("/api/v1/appointments").header("Authorization", "Bearer " + userToken).contentType(MediaType.APPLICATION_JSON).content("""
+                {"professionalId":%d,"locationId":%d,"specialtyId":%d,"date":"%s","startTime":"09:00","reason":"Especializada"}
+                """.formatted(professional, location, specialized, date)))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.status").value("REQUESTED"));
+        String pending = mvc.perform(get("/api/v1/admin/appointments/pending-specialized").header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].durationMinutes").value(60)).andReturn().getResponse().getContentAsString();
+        Long appointment = mapper.readTree(pending).get(0).get("id").asLong();
+        mvc.perform(post("/api/v1/admin/appointments/{id}/decision", appointment).header("Authorization", "Bearer " + adminToken).contentType(MediaType.APPLICATION_JSON).content("{" + "\"decision\":\"REJECT\",\"reason\":\"Sin disponibilidad\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("REJECTED"));
     }
 
     @Test void simultaneousRefreshAllowsOnlyOneRotation() throws Exception {
