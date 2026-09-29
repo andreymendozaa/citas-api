@@ -12,9 +12,13 @@ Este mapa convierte el PRD v1 y las restricciones autorizadas en trabajo secuenc
 ## Arquitectura y supuestos constatados
 
 - Backend requerido: Java 21, Spring Boot 3.5.x, Maven, arquitectura hexagonal, JPA, Flyway, MySQL 8.4 y REST/JSON.
-- Cliente requerido: TypeScript con React o Angular por decidir, consume REST directo; no hay Express ni BFF.
+- Cliente implementado: TypeScript con React/Vite, consume REST directo; no hay Express ni BFF.
 - Los catálogos fijos se cargan por seed; los datos del laboratorio son sintéticos.
 - El repositorio contiene la aplicación backend y el contrato inicial de identidad. HU-005/006/007 están `Completada` para el corte backend con evidencia de `mvn test` (8 pruebas, 0 fallos); HU-001/002/003 y las épicas EP-001/002 permanecen parciales.
+
+## Registro S4 — evidencia sin cierre de HU · 2026-09-29
+
+El corte S3 conserva sus rutas y la BD Flyway V1/V2 sin modificación. Las pruebas verificadas son 18 Maven y 16 Vitest, más `npm run lint` y `npm run build`. Se comprobó concurrencia, reglas de slots, aprobación/rechazo e historial, autorizaciones, profesional/sede/especialidad inválidos y contratos de formularios para USER, ADMIN y PROFESSIONAL. Los endpoints de oferta y agenda se consumen desde React sin datos simulados; `GET /admin/professionals` no devuelve datos de acceso. Este registro no marca HU-003, HU-004, HU-011 ni HU-014 a HU-024 como completadas: sus CA/DoD permanecen sujetos a la auditoría integral.
 
 ## Épicas
 

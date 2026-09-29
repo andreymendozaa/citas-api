@@ -175,8 +175,16 @@ class AuthIntegrationTest extends DatabaseIntegrationSupport {
         mvc.perform(get("/api/v1/admin/specialties").header("Authorization", "Bearer " + user)).andExpect(status().isForbidden());
         mvc.perform(get("/api/v1/professional/availability-blocks").header("Authorization", "Bearer " + user)).andExpect(status().isForbidden());
 
+        String professionalEmail = uniqueEmail();
+        jdbc.update("insert into users(first_name,last_name,document_type,document_number,email,phone,password_hash,active,email_verified) values ('Rol','Profesional','CC',?,?,?,'hash',true,false)", uniqueDoc(), professionalEmail, "3000000000");
+        Long professionalUser = jdbc.queryForObject("select id from users where email=?", Long.class, professionalEmail);
+        jdbc.update("insert into professionals(user_id,professional_code,license_number,active) values (?,?,?,true)", professionalUser, "PC" + UUID.randomUUID(), "LIC" + UUID.randomUUID());
+        String professional = jwt.access(professionalUser, Set.of("PROFESSIONAL"));
+        mvc.perform(get("/api/v1/professional/availability-blocks").header("Authorization", "Bearer " + professional)).andExpect(status().isOk());
+
         String admin = jwt.access(1L, Set.of("ADMIN"));
         mvc.perform(get("/api/v1/admin/specialties").header("Authorization", "Bearer " + admin)).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/admin/professionals").header("Authorization", "Bearer " + admin)).andExpect(status().isOk());
     }
 
     @Test void simultaneousRefreshAllowsOnlyOneRotation() throws Exception {

@@ -108,6 +108,29 @@ class SchedulingServiceIntegrationTest extends DatabaseIntegrationSupport {
         assertThat(scheduling.blocks(owner,null,null)).noneMatch(candidate -> candidate.id().equals(block.id()));
         assertThat(jdbc.queryForObject("select count(*) from professional_slots where availability_block_id=?",Integer.class,block.id())).isZero();
     }
+    @Test void listsProfessionalsWithTheirActiveAssignments() {
+        String suffix=UUID.randomUUID().toString();
+        Long professional=scheduling.createProfessional("Catalog","Professional","CC","P"+suffix,"catalog-"+suffix+"@example.test","300","hash","PC"+suffix,"LIC"+suffix);
+        Long specialty=scheduling.createSpecialty("CAT"+suffix,"Catálogo "+suffix,30,false).id(); Long location=jdbc.queryForObject("select id from locations where active=true limit 1",Long.class);
+        scheduling.setProfessionalSpecialties(professional,List.of(specialty),specialty); scheduling.setProfessionalLocations(professional,List.of(location));
+        assertThat(scheduling.professionals()).anySatisfy(item -> {
+            assertThat(item.id()).isEqualTo(professional);
+            assertThat(item.name()).isEqualTo("Catalog Professional");
+            assertThat(item.specialtyIds()).containsExactly(specialty);
+            assertThat(item.locationIds()).containsExactly(location);
+        });
+    }
+    @Test void rejectsReservationsForAnUnavailableProfessionalOrLocation() {
+        String suffix=UUID.randomUUID().toString();
+        Long professional=scheduling.createProfessional("Reserve","Rules","CC","P"+suffix,"reserve-"+suffix+"@example.test","300","hash","PC"+suffix,"LIC"+suffix);
+        Long owner=jdbc.queryForObject("select user_id from professionals where id=?",Long.class,professional); Long location=jdbc.queryForObject("select id from locations where active=true limit 1",Long.class);
+        Long specialty=scheduling.createSpecialty("RSV"+suffix,"Reserva "+suffix,30,true).id(); scheduling.setProfessionalSpecialties(professional,List.of(specialty),specialty); scheduling.setProfessionalLocations(professional,List.of(location));
+        LocalDate date=LocalDate.now().plusDays(6); scheduling.createBlock(owner,location,date,LocalTime.of(8,0),LocalTime.of(9,0)); Long patient=user("reserve-patient-"+suffix+"@example.test","U"+suffix);
+        assertThatThrownBy(() -> scheduling.reserve(patient,professional + 999999,location,specialty,LocalDateTime.of(date,LocalTime.of(8,0)),"Prueba")).hasMessageContaining("Profesional");
+        assertThatThrownBy(() -> scheduling.reserve(patient,professional,location + 999999,specialty,LocalDateTime.of(date,LocalTime.of(8,0)),"Prueba")).hasMessageContaining("Profesional");
+        scheduling.setProfessionalActive(professional,false);
+        assertThatThrownBy(() -> scheduling.reserve(patient,professional,location,specialty,LocalDateTime.of(date,LocalTime.of(8,0)),"Prueba")).hasMessageContaining("Profesional");
+    }
     private String reserveStatus(CountDownLatch start,Long patient,Long professional,Long location,Long specialty,LocalDate date) throws Exception { start.await(); try { return scheduling.reserve(patient,professional,location,specialty,LocalDateTime.of(date,LocalTime.of(8,0)),"Concurrente").status(); } catch (RuntimeException error) { return "CONFLICT"; } }
     private Long user(String email,String document) { jdbc.update("insert into users(first_name,last_name,document_type,document_number,email,phone,password_hash,active,email_verified) values ('Test','User','CC',?,?,?,'hash',true,false)",document,email,"300"); return jdbc.queryForObject("select id from users where email=?",Long.class,email); }
 }

@@ -40,7 +40,7 @@ public final class Ports {
     public interface Scheduling {
         List<Map<String,Object>> catalog(String name);
         List<SchedulingService.Specialty> specialties(boolean activeOnly);
-        List<Map<String,Object>> professionals();
+        List<SchedulingService.Professional> professionals();
         SchedulingService.Specialty createSpecialty(String code, String name, int duration, boolean general);
         SchedulingService.Specialty updateSpecialty(Long id, String name, Integer duration, Boolean active);
         Long createProfessional(String first, String last, String docType, String document, String email, String phone, String passwordHash, String code, String license);

@@ -40,7 +40,7 @@ Todos los recursos S3 usan `/api/v1`, JWT access en `Authorization: Bearer` y JS
 | Catálogos | `GET /catalogs/{locations|appointment-statuses|roles|regimes|plans}` | autenticado |
 | Especialidades disponibles | `GET /specialties` | autenticado |
 | Especialidades ADMIN | `GET|POST|PATCH /admin/specialties[/{id}]` | ADMIN |
-| Profesionales | `POST /admin/professionals`; `PUT /admin/professionals/{id}/specialties|locations`; `PATCH /admin/professionals/{id}/active` | ADMIN |
+| Profesionales | `GET|POST /admin/professionals`; `PUT /admin/professionals/{id}/specialties|locations`; `PATCH /admin/professionals/{id}/active` | ADMIN |
 | Bloques propios | `GET|POST /professional/availability-blocks`; `PATCH|DELETE /professional/availability-blocks/{id}` | PROFESSIONAL |
 | Disponibilidad | `GET /availability?locationId=&specialtyId=&date=&professionalId?` | USER |
 | Reserva | `POST /appointments` | USER |
@@ -48,7 +48,7 @@ Todos los recursos S3 usan `/api/v1`, JWT access en `Authorization: Bearer` y JS
 
 `POST /auth/register` acepta `insurancePlanId` opcional; la afiliación es administrativa y no modifica las reglas de agenda. `POST /appointments` recibe `professionalId`, `locationId`, `specialtyId`, `date`, `startTime` y `reason` opcional. La API deriva la naturaleza general o especializada desde la especialidad: devuelve `APPROVED` para general y `REQUESTED` para especializada. Una decisión ADMIN recibe `APPROVE` o `REJECT`; el rechazo exige `reason`.
 
-Errores de validación usan `400`; recursos o relaciones inexistentes usan `404`; rol u ownership usan `403`; slots ocupados, selección inválida o transición no permitida usan `409`. El frontend consume estas rutas directamente, sin BFF, y no guarda citas ni slots como fuente de verdad.
+`GET /admin/professionals` devuelve solo `id`, nombre, código profesional, matrícula, estado y IDs de asignaciones activas; no devuelve correo, contraseña temporal ni hash. Errores de validación usan `400`; recursos o relaciones inexistentes usan `404`; rol u ownership usan `403`; slots ocupados, selección inválida o transición no permitida usan `409`. El frontend consume estas rutas directamente, sin BFF, y no guarda citas ni slots como fuente de verdad.
 
 ## DECISIÓN — 2026-09-22 · Corte web de autenticación
 
