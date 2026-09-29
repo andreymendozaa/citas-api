@@ -59,3 +59,7 @@ El CORS permite exclusivamente `FRONTEND_ORIGIN`, métodos `POST`, `GET`, `OPTIO
 ## DECISIÓN — 2026-09-29 · Consulta USER de Mis citas
 
 `GET /api/v1/appointments/mine?status=&date=` es exclusivo de `USER` y obtiene el usuario desde el JWT; no acepta ni expone un identificador de paciente. `status` y `date` (`YYYY-MM-DD`) son opcionales. Cada elemento devuelve `id`, `professionalName`, `specialtyName`, `locationName`, `startAt`, `endAt`, `durationMinutes`, `status` y `rejectionReason` cuando la cita fue rechazada. La consulta se construye sobre las FKs existentes de `appointments`, catálogos y `appointment_status_history`, por lo que no requiere migración ni altera reservas, slots o estados.
+
+## DECISIÓN — 2026-09-29 · Cancelación y reprogramación
+
+`POST /appointments/{id}/cancel` permite exclusivamente al USER propietario cancelar una cita futura no terminal, libera sus slots y registra `CANCELLED`. `POST /appointments/{id}/reschedule` recibe `locationId`, `date` y `startTime`; conserva profesional/especialidad, retiene la nueva franja y crea una solicitud `PENDING` sin liberar la original. ADMIN consulta `GET /admin/reschedule-requests/pending` y resuelve con `POST /admin/reschedule-requests/{id}/decision`; `APPROVE` intercambia franjas y `REJECT` libera la provisional. V3 añade las tablas normalizadas de solicitudes y sus estados.

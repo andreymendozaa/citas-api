@@ -54,6 +54,10 @@ public final class Ports {
         List<SchedulingService.Available> availability(Long locationId, Long specialtyId, Long professionalId, LocalDate date);
         SchedulingService.Appointment reserve(Long userId, Long professionalId, Long locationId, Long specialtyId, LocalDateTime start, String reason);
         List<SchedulingService.MyAppointment> appointments(Long userId, String status, LocalDate date);
+        SchedulingService.Appointment cancel(Long userId, Long appointmentId);
+        SchedulingService.RescheduleRequest requestReschedule(Long userId, Long appointmentId, Long locationId, LocalDateTime start);
+        List<SchedulingService.PendingReschedule> pendingReschedules();
+        SchedulingService.RescheduleRequest decideReschedule(Long adminId, Long requestId, String decision, String reason);
         List<SchedulingService.PendingAppointment> pending();
         SchedulingService.Appointment decide(Long adminId, Long appointmentId, String decision, String reason);
     }

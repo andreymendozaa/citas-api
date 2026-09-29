@@ -17,7 +17,9 @@ public class SchedulingService {
     public record Block(Long id, Long locationId, LocalDate date, LocalTime start, LocalTime end) {}
     public record Available(Long professionalId, String professionalName, LocalDateTime startAt, LocalDateTime endAt) {}
     public record Appointment(Long id, String status, LocalDateTime startAt, LocalDateTime endAt) {}
-    public record MyAppointment(Long id, String professionalName, String specialtyName, String locationName, LocalDateTime startAt, LocalDateTime endAt, int durationMinutes, String status, String rejectionReason) {}
+    public record MyAppointment(Long id, Long professionalId, Long specialtyId, Long locationId, String professionalName, String specialtyName, String locationName, LocalDateTime startAt, LocalDateTime endAt, int durationMinutes, String status, String rejectionReason, Long rescheduleRequestId, String rescheduleStatus, LocalDateTime rescheduleRequestedStartAt, String rescheduleDecisionReason) {}
+    public record RescheduleRequest(Long id, String status) {}
+    public record PendingReschedule(Long id, Long appointmentId, String patientName, String professionalName, String specialtyName, String locationName, LocalDateTime previousStartAt, LocalDateTime requestedStartAt, LocalDateTime requestedEndAt) {}
     public record PendingAppointment(Long id, String patientName, String professionalName, String specialtyName, String locationName, LocalDateTime startAt, LocalDateTime endAt, int durationMinutes) {}
 
     private final Ports.Scheduling scheduling;
@@ -43,6 +45,10 @@ public class SchedulingService {
     public List<Available> availability(Long locationId, Long specialtyId, Long professionalId, LocalDate date) { return scheduling.availability(locationId, specialtyId, professionalId, date); }
     @Transactional public Appointment reserve(Long userId, Long professionalId, Long locationId, Long specialtyId, LocalDateTime start, String reason) { return scheduling.reserve(userId, professionalId, locationId, specialtyId, start, reason); }
     public List<MyAppointment> appointments(Long userId, String status, LocalDate date) { return scheduling.appointments(userId, status, date); }
+    @Transactional public Appointment cancel(Long userId, Long appointmentId) { return scheduling.cancel(userId, appointmentId); }
+    @Transactional public RescheduleRequest requestReschedule(Long userId, Long appointmentId, Long locationId, LocalDateTime start) { return scheduling.requestReschedule(userId, appointmentId, locationId, start); }
+    public List<PendingReschedule> pendingReschedules() { return scheduling.pendingReschedules(); }
+    @Transactional public RescheduleRequest decideReschedule(Long adminId, Long requestId, String decision, String reason) { return scheduling.decideReschedule(adminId, requestId, decision, reason); }
     public List<PendingAppointment> pending() { return scheduling.pending(); }
     @Transactional public Appointment decide(Long adminId, Long appointmentId, String decision, String reason) { return scheduling.decide(adminId, appointmentId, decision, reason); }
 }
