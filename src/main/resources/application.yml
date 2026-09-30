@@ -26,3 +26,5 @@ app:
   cookie:
     secure: ${REFRESH_COOKIE_SECURE:true}
     same-site: ${REFRESH_COOKIE_SAME_SITE:None}
+  password-reset:
+    ttl-minutes: ${PASSWORD_RESET_TTL_MINUTES:30}

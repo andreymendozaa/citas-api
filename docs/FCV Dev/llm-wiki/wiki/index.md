@@ -1,6 +1,6 @@
 # Índice de la LLM Wiki
 
-Última actualización: 2026-09-22. El corte backend de identidad (HU-005/006/007) tiene implementación y contrato REST inicial. El frontend React/Vite está importado y contiene trabajo local de integración auth pendiente de verificación. Las demás capacidades siguen sin contrato final.
+Última actualización: 2026-09-29. Identidad (HU-005/006/007), agendamiento S3 completo (HU-014 a HU-028) y, del Incremento 1 de S4, el backend de recuperación/restablecimiento de contraseña (HU-008/009), perfil (HU-010) y catálogos EPS (HU-012/013) están implementados y verificados con Maven (33/33). El frontend de este último bloque queda pendiente para una ronda posterior. El Incremento 3 de S4 (agenda profesional, cierre, bandeja unificada, auditoría) y S5 (Swagger, `current-state.md`, webhook n8n) siguen sin implementar.
 
 ## Lectura recomendada
 

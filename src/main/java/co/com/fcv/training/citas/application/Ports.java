@@ -1,6 +1,7 @@
 package co.com.fcv.training.citas.application;
 
 import co.com.fcv.training.citas.domain.Account;
+import co.com.fcv.training.citas.domain.PasswordResetToken;
 import co.com.fcv.training.citas.domain.RefreshSession;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,12 +22,15 @@ public final class Ports {
         Optional<Account> byEmail(String email);
         Optional<Account> byId(Long id);
         Account save(Account account);
+        Account updatePhone(Long userId, String phone);
+        void updatePasswordHash(Long userId, String passwordHash);
     }
 
     public interface Sessions {
         void save(RefreshSession session);
         Optional<RefreshSession> lockByJtiHash(String hash);
         void revoke(Long id, Instant when);
+        void revokeAllByUserId(Long userId, Instant when);
     }
 
     public interface Passwords {
@@ -35,6 +39,19 @@ public final class Ports {
     }
 
     public interface Affiliations { void createCurrent(Long userId, Long planId); }
+
+    /** Persistence for password recovery tokens (HU-008/HU-009). */
+    public interface PasswordResets {
+        void save(PasswordResetToken token);
+        Optional<PasswordResetToken> lockByTokenHash(String hash);
+        void markUsed(Long id, Instant when);
+    }
+
+    /** Optional notification of a freshly issued recovery token. Real delivery (email/SMTP) is out of scope;
+     *  in development only the local mailbox (profile "local") implements this. */
+    public interface PasswordResetNotifications {
+        void publish(Long userId, String email, String rawToken, Instant expiresAt);
+    }
 
     /** Persistence boundary for the scheduling use cases. */
     public interface Scheduling {
@@ -60,6 +77,12 @@ public final class Ports {
         SchedulingService.RescheduleRequest decideReschedule(Long adminId, Long requestId, String decision, String reason);
         List<SchedulingService.PendingAppointment> pending();
         SchedulingService.Appointment decide(Long adminId, Long appointmentId, String decision, String reason);
+        List<SchedulingService.Eps> epsList(boolean activeOnly);
+        SchedulingService.Eps createEps(String code, String name);
+        SchedulingService.Eps updateEps(Long id, String name, Boolean active);
+        List<SchedulingService.EpsPlan> epsPlans(Long epsId);
+        SchedulingService.EpsPlan createEpsPlan(Long epsId, Long regimeId, String code, String name);
+        SchedulingService.EpsPlan updateEpsPlan(Long id, String name, Boolean active);
     }
 
     public record IssuedRefresh(String value, String jti, Instant expiresAt) {}

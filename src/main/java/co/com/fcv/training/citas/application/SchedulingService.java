@@ -21,6 +21,8 @@ public class SchedulingService {
     public record RescheduleRequest(Long id, String status) {}
     public record PendingReschedule(Long id, Long appointmentId, String patientName, String professionalName, String specialtyName, String locationName, LocalDateTime previousStartAt, LocalDateTime requestedStartAt, LocalDateTime requestedEndAt) {}
     public record PendingAppointment(Long id, String patientName, String professionalName, String specialtyName, String locationName, LocalDateTime startAt, LocalDateTime endAt, int durationMinutes) {}
+    public record Eps(Long id, String code, String name, boolean active) {}
+    public record EpsPlan(Long id, Long epsId, Long regimeId, String code, String name, boolean active) {}
 
     private final Ports.Scheduling scheduling;
 
@@ -51,4 +53,11 @@ public class SchedulingService {
     @Transactional public RescheduleRequest decideReschedule(Long adminId, Long requestId, String decision, String reason) { return scheduling.decideReschedule(adminId, requestId, decision, reason); }
     public List<PendingAppointment> pending() { return scheduling.pending(); }
     @Transactional public Appointment decide(Long adminId, Long appointmentId, String decision, String reason) { return scheduling.decide(adminId, appointmentId, decision, reason); }
+
+    public List<Eps> epsList(boolean activeOnly) { return scheduling.epsList(activeOnly); }
+    @Transactional public Eps createEps(String code, String name) { return scheduling.createEps(code, name); }
+    @Transactional public Eps updateEps(Long id, String name, Boolean active) { return scheduling.updateEps(id, name, active); }
+    public List<EpsPlan> epsPlans(Long epsId) { return scheduling.epsPlans(epsId); }
+    @Transactional public EpsPlan createEpsPlan(Long epsId, Long regimeId, String code, String name) { return scheduling.createEpsPlan(epsId, regimeId, code, name); }
+    @Transactional public EpsPlan updateEpsPlan(Long id, String name, Boolean active) { return scheduling.updateEpsPlan(id, name, active); }
 }

@@ -2,7 +2,7 @@
 id: HU-012
 tipo: historia-de-usuario
 titulo: "Gestionar EPS"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-003-administracion-de-catalogos-y-profesionales]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 3"
@@ -46,10 +46,11 @@ Es catálogo configurable; no se borra físicamente si está referenciado.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS (backend) | `InsuranceAdminIntegrationTest.adminCrudEpsAndLogicalDeactivationHidesItFromPublicList` | ADMIN crea, consulta (`GET /api/v1/admin/eps`) y actualiza (`PATCH`) EPS; código duplicado responde `409` (`duplicateEpsCodeConflicts`). |
+| CA-02 | PASS (backend) | `InsuranceAdminIntegrationTest.adminCrudEpsAndLogicalDeactivationHidesItFromPublicList` | Sin borrado físico; `PATCH .../active:false` la retira del catálogo público `GET /api/v1/eps` conservando el registro y sus referencias en `eps_plans`. |
+| CA-03 / DoD | PASS (backend) | `InsuranceAdminIntegrationTest.nonAdminCannotManageEpsOrPlans` | Rol distinto de ADMIN recibe `403` en lectura y escritura administrativa. Falta cliente ADMIN (T-03). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-29 — Backend implementado y verificado (Maven 33/33 verde): `GET/POST/PATCH /api/v1/admin/eps` y `GET /api/v1/eps`, clonado del patrón ya aprobado de `specialties`. Sin migración nueva (tabla `eps` ya existía desde V2). Frontend pendiente para una ronda posterior.
 ## Notas y decisiones
-- Los campos concretos del catálogo deben aprobarse en el contrato.
+- Campos de catálogo aprobados por contrato: `code`, `name`, `active` (baja lógica). Sin atributos adicionales por ahora.

@@ -2,7 +2,7 @@
 id: HU-008
 tipo: historia-de-usuario
 titulo: "Solicitar recuperación de contraseña"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-002-identidad-y-perfil-del-usuario]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 2"
@@ -48,10 +48,11 @@ SMTP real es opcional; en desarrollo el token solo puede exponerse por vía segu
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | Requiere decisión de canal. |
+| CA-01 | PASS (backend) | `PasswordResetIntegrationTest.resetPasswordHashesUpdatesAndRevokesAllSessions` | Token aleatorio de 32 bytes, persistido solo como hash SHA-256, un solo uso. |
+| CA-02 | PASS (backend) | `PasswordResetIntegrationTest.recoveryAlwaysAcceptsAndNeverLeaksAccountExistence` | `POST /api/v1/auth/password-recovery` responde `202` igual para email existente/inexistente. |
+| CA-03 / DoD | PASS (backend) | `LocalMailboxIntegrationTest.adminReadsTokenUserIsForbiddenAndTokenResetsThePassword` | Buzón local activo solo con perfil `local`, exclusivo ADMIN; `PasswordResetIntegrationTest.localMailboxRouteDoesNotExistOutsideLocalProfile` confirma `404` fuera de ese perfil. Falta pantalla/feedback de frontend (T-03). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-29 — Backend implementado y verificado (Maven 33/33 verde): `POST /api/v1/auth/password-recovery`, migración `V4__password_reset_tokens.sql`, buzón local `@Profile("local")`. Frontend pendiente para una ronda posterior.
 ## Notas y decisiones
-- Incógnita abierta: mecanismo seguro de entrega local.
+- Mecanismo seguro de entrega en desarrollo resuelto: buzón local en memoria (`LocalPasswordResetMailbox`), nunca persistido ni logueado en texto claro, expuesto solo por `GET /api/v1/admin/local-mailbox/password-resets` bajo perfil `local` y rol ADMIN.

@@ -2,6 +2,7 @@ package co.com.fcv.training.citas.adapter.web;
 
 import co.com.fcv.training.citas.application.AuthFailure;
 import co.com.fcv.training.citas.application.DuplicateIdentity;
+import co.com.fcv.training.citas.application.PasswordResetFailure;
 import co.com.fcv.training.citas.application.SchedulingFailure;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,11 @@ class ApiErrors {
     @ExceptionHandler(AuthFailure.class)
     ResponseEntity<ProblemDetail> unauthorized(AuthFailure ignored) {
         return problem(HttpStatus.UNAUTHORIZED, "Credenciales o sesión inválidas");
+    }
+
+    @ExceptionHandler(PasswordResetFailure.class)
+    ResponseEntity<ProblemDetail> passwordReset(PasswordResetFailure failure) {
+        return problem(HttpStatus.BAD_REQUEST, failure.getMessage());
     }
 
     @ExceptionHandler(SchedulingFailure.class)

@@ -26,6 +26,10 @@ class SchedulingController {
     record AppointmentRequest(@NotNull Long professionalId,@NotNull Long locationId,@NotNull Long specialtyId,@NotNull LocalDate date,@NotNull LocalTime startTime,@Size(max=500) String reason) {}
     record RescheduleRequest(@NotNull Long locationId,@NotNull LocalDate date,@NotNull LocalTime startTime) {}
     record DecisionRequest(@NotBlank String decision,@Size(max=500) String reason) {}
+    record EpsRequest(@NotBlank @Size(max=30) String code,@NotBlank @Size(max=150) String name) {}
+    record EpsPatch(@Size(max=150) String name,Boolean active) {}
+    record EpsPlanRequest(@NotNull Long epsId,@NotNull Long regimeId,@NotBlank @Size(max=50) String code,@NotBlank @Size(max=150) String name) {}
+    record EpsPlanPatch(@Size(max=150) String name,Boolean active) {}
     private final SchedulingService scheduling; private final Ports.Passwords passwords;
     SchedulingController(SchedulingService scheduling, Ports.Passwords passwords){this.scheduling=scheduling;this.passwords=passwords;}
     @GetMapping("/catalogs/{catalog}") List<Map<String,Object>> catalog(@PathVariable String catalog){return scheduling.catalog(catalog);}
@@ -51,5 +55,12 @@ class SchedulingController {
     @GetMapping("/admin/reschedule-requests/pending") @PreAuthorize("hasRole('ADMIN')") List<SchedulingService.PendingReschedule> pendingReschedules(){return scheduling.pendingReschedules();}
     @PostMapping("/admin/reschedule-requests/{id}/decision") @PreAuthorize("hasRole('ADMIN')") SchedulingService.RescheduleRequest decideReschedule(Authentication a,@PathVariable Long id,@Valid @RequestBody DecisionRequest r){return scheduling.decideReschedule(user(a),id,r.decision().trim().toUpperCase(Locale.ROOT),r.reason());}
     @PostMapping("/admin/appointments/{id}/decision") @PreAuthorize("hasRole('ADMIN')") SchedulingService.Appointment decide(Authentication a,@PathVariable Long id,@Valid @RequestBody DecisionRequest r){return scheduling.decide(user(a),id,r.decision().trim().toUpperCase(Locale.ROOT),r.reason());}
+    @GetMapping("/eps") List<SchedulingService.Eps> eps(){return scheduling.epsList(true);}
+    @GetMapping("/admin/eps") @PreAuthorize("hasRole('ADMIN')") List<SchedulingService.Eps> allEps(){return scheduling.epsList(false);}
+    @PostMapping("/admin/eps") @PreAuthorize("hasRole('ADMIN')") ResponseEntity<SchedulingService.Eps> createEps(@Valid @RequestBody EpsRequest r){return ResponseEntity.status(HttpStatus.CREATED).body(scheduling.createEps(r.code(),r.name()));}
+    @PatchMapping("/admin/eps/{id}") @PreAuthorize("hasRole('ADMIN')") SchedulingService.Eps patchEps(@PathVariable Long id,@Valid @RequestBody EpsPatch r){return scheduling.updateEps(id,r.name(),r.active());}
+    @GetMapping("/admin/eps-plans") @PreAuthorize("hasRole('ADMIN')") List<SchedulingService.EpsPlan> epsPlans(@RequestParam(required=false) Long epsId){return scheduling.epsPlans(epsId);}
+    @PostMapping("/admin/eps-plans") @PreAuthorize("hasRole('ADMIN')") ResponseEntity<SchedulingService.EpsPlan> createEpsPlan(@Valid @RequestBody EpsPlanRequest r){return ResponseEntity.status(HttpStatus.CREATED).body(scheduling.createEpsPlan(r.epsId(),r.regimeId(),r.code(),r.name()));}
+    @PatchMapping("/admin/eps-plans/{id}") @PreAuthorize("hasRole('ADMIN')") SchedulingService.EpsPlan patchEpsPlan(@PathVariable Long id,@Valid @RequestBody EpsPlanPatch r){return scheduling.updateEpsPlan(id,r.name(),r.active());}
     private Long user(Authentication a){try{return Long.valueOf(a.getName());}catch(Exception e){throw new IllegalStateException("Principal inválido");}}
 }

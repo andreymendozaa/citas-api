@@ -2,7 +2,7 @@
 id: HU-013
 tipo: historia-de-usuario
 titulo: "Gestionar planes de EPS"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-003-administracion-de-catalogos-y-profesionales]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 3"
@@ -46,10 +46,11 @@ El plan depende de EPS y tampoco se borra físicamente si está referenciado.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS (backend) | `InsuranceAdminIntegrationTest.epsPlanValidatesExistingActiveEpsAndRegime` | `POST /api/v1/admin/eps-plans` exige `epsId`/`regimeId` existentes; el plan creado queda asociado a la EPS indicada. |
+| CA-02 | PASS (backend) | `InsuranceAdminIntegrationTest.epsPlanValidatesExistingActiveEpsAndRegime` | Sin borrado físico; `PATCH .../active:false` conserva el registro y lo retira del catálogo público `GET /api/v1/catalogs/plans` (regresión de [[HU-011-gestionar-afiliacion]] verificada explícitamente). |
+| CA-03 / DoD | PASS (backend) | `InsuranceAdminIntegrationTest.epsPlanValidatesExistingActiveEpsAndRegime` | EPS inexistente o régimen inválido devuelven `404`; EPS inactiva devuelve `409`; código de plan duplicado dentro de la misma EPS devuelve `409`. Falta cliente (T-03). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-29 — Backend implementado y verificado (Maven 33/33 verde): `GET/POST/PATCH /api/v1/admin/eps-plans`, sin migración nueva (tabla `eps_plans` ya existía desde V2). Frontend pendiente para una ronda posterior.
 ## Notas y decisiones
-- No se presupone un atributo comercial para el plan.
+- Confirmado: sin atributo comercial nuevo para el plan; solo `code`, `name`, `active` son editables por ADMIN además de la asociación `epsId`/`regimeId` fijada al crear.

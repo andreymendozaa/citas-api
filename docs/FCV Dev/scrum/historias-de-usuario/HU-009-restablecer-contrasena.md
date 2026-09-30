@@ -2,7 +2,7 @@
 id: HU-009
 tipo: historia-de-usuario
 titulo: "Restablecer contraseña"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-002-identidad-y-perfil-del-usuario]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 2"
@@ -46,10 +46,11 @@ Cambiar contraseña consume/invalida el token de recuperación.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS (backend) | `PasswordResetIntegrationTest.resetPasswordHashesUpdatesAndRevokesAllSessions` | Login posterior con la nueva contraseña exitoso; la anterior deja de funcionar. |
+| CA-02 | PASS (backend) | `PasswordResetIntegrationTest.resetPasswordRejectsExpiredToken`, `resetPasswordRejectsUnknownTokenAndMismatchedConfirmation` | Token usado, expirado, inexistente o con confirmación distinta rechazan el cambio (`400`) sin tocar `password_hash`. |
+| CA-03 / DoD | PASS (backend) | `PasswordResetIntegrationTest.resetPasswordHashesUpdatesAndRevokesAllSessions` | Hash BCrypt (`$2...`), token marcado `used_at`, y todos los refresh tokens del usuario revocados (`Ports.Sessions#revokeAllByUserId`); acceso JWT ya emitido expira por su propia vigencia de 15 min. Falta cliente (T-03). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-29 — Backend implementado y verificado (Maven 33/33 verde): `POST /api/v1/auth/password-reset`, revocación total de sesiones y consumo de un solo uso. Frontend pendiente para una ronda posterior.
 ## Notas y decisiones
-- La política de sesiones posteriores debe documentarse con [[HU-007-renovar-y-cerrar-sesion]].
+- Política de sesión aplicada: reset revoca todos los `refresh_tokens` del usuario (nuevo `Ports.Sessions#revokeAllByUserId`); los access JWT ya emitidos no se invalidan activamente y expiran solos a los 15 minutos, consistente con [[HU-007-renovar-y-cerrar-sesion]].

@@ -2,7 +2,7 @@
 id: HU-010
 tipo: historia-de-usuario
 titulo: "Gestionar perfil"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-002-identidad-y-perfil-del-usuario]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 2"
@@ -46,10 +46,11 @@ El PRD no enumera cuáles campos de identidad pueden cambiar; esa limitación de
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | Requiere acuerdo de campos. |
+| CA-01 | PASS (backend) | `ProfileIntegrationTest.meRequiresAuthenticationAndReturnsOwnDataWithoutSecrets` | `GET /api/v1/users/me` exige autenticación y devuelve solo datos propios sin `passwordHash`. |
+| CA-02 | PASS (backend) | `ProfileIntegrationTest.patchMeUpdatesOnlyPhoneAndPersists` | `PATCH /api/v1/users/me` persiste `phone` y se refleja en consultas posteriores. |
+| CA-03 / DoD | PASS (backend) | `ProfileIntegrationTest.patchMeRejectsPayloadsThatTouchImmutableFields`, `patchMeOnlyAffectsTheAuthenticatedUser` | Cualquier campo distinto de `phone` en el payload es rechazado (`400`) sin modificar la fila; ownership aislado por usuario. Falta cliente (T-03). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-29 — Backend implementado y verificado (Maven 33/33 verde): `GET/PATCH /api/v1/users/me`. Frontend pendiente para una ronda posterior.
 ## Notas y decisiones
-- Pregunta abierta: campos exactos editables.
+- Campos editables resueltos por contrato (`S4.md`): únicamente `phone`. Nombres, email, documento y roles permanecen inmutables; el endpoint rechaza explícitamente cualquier otro campo en el payload en vez de ignorarlo silenciosamente.
