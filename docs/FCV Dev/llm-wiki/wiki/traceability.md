@@ -71,4 +71,19 @@ La prueba usa `@AfterEach` para resolver sus citas `REQUESTED` aunque falle: la 
 
 Estado global: 22 `Completada` y 9 `En desarrollo` (HU-003, 004, 014, 015, 016, 018, 019, 020, 021).
 
+**HECHO — tercera actualización · reglas de oferta y agenda.** Se añadió `OfferAndAgendaRulesIntegrationTest` (7 casos), que cubre:
+- HU-014: duración 30/60 en alta y `PATCH`.
+- HU-015: alta solo por ADMIN; duplicados sin filas parciales, con reversión transaccional del usuario.
+- HU-016: especialidad primaria única y especialidad no asociada.
+- HU-018: dos franjas sin el hueco intermedio, también para 60 min.
+- HU-019: bloques ajenos, comprometidos y pasados.
+- HU-020: filtros de fecha y sede.
+
+Siguiendo Red → Green, solo falló HU-019: un bloque de un día ya pasado podía moverse al futuro y eliminarse. `updateBlock/deleteBlock` responden ahora `409`.
+
+Resultado:
+- Maven 58/58.
+- Estado global: 27 `Completada` y 4 `En desarrollo`: HU-003 y HU-021 por funcionalidad, HU-016 por UI, HU-004 por OpenAPI.
+- Ninguna HU queda pendiente solo por falta de pruebas.
+
 **PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.
