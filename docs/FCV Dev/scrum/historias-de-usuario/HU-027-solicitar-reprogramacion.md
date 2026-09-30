@@ -2,7 +2,7 @@
 id: HU-027
 tipo: historia-de-usuario
 titulo: "Solicitar reprogramación"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-006-ciclo-de-vida-de-citas-y-reprogramaciones]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 5"
@@ -46,10 +46,11 @@ Conserva profesional/especialidad; cambiar profesional es una nueva cita. La sol
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PARCIAL | `AppointmentEventsIntegrationTest`, `InboxIntegrationTest` (crean reprogramación `PENDING`); validación manual en Chrome 2026-09-30 | **Falta** afirmar la retención de la nueva franja. |
+| CA-02 | PARCIAL | Validación manual 2026-09-30 (la cita original conservó su franja) | **Falta** prueba automatizada. |
+| CA-03 / DoD | PENDIENTE | Guardas en `SchedulingJdbcAdapter.requestReschedule` | **Falta** prueba (no elegible, franja no disponible, solicitud duplicada). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Pendiente de aprobación` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - Se conserva el significado exacto de `PENDING` del catálogo fijo.

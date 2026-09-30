@@ -47,11 +47,12 @@ El PRD exige REST/JSON directo, pero no fija rutas, formatos ni códigos. Estos 
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PARCIAL | `llm-wiki/wiki/contracts.md` (decisiones por incremento) | Contrato descrito en prosa. **Falta** especificación OpenAPI publicada (S5, springdoc) con representaciones y errores de todas las rutas. |
+| CA-02 | PASS | `citas-web/src/api/schedulingApi.ts` y `src/auth/authApi.ts` con `VITE_API_URL`; `schedulingApi.test.ts`, `authApi.test.ts` | Consumo REST/JSON directo, sin Express ni BFF. |
+| CA-03 / DoD | PASS (proceso) | `AGENTS.md` raíz (Cambios cross-repo); decisiones fechadas en `contracts.md` | Regla de planificación cross-repo vigente y aplicada en S3/S4. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado se mantiene `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - No hay contrato final aprobado a la fecha.
 - 2026-09-17: aprobado el contrato inicial de HU-005/006/007 documentado en `../../llm-wiki/wiki/contracts.md`. El resto de capacidades se añadirá cuando sus HU se aprueben. El impacto cross-repo está enumerado en esa página; no se edita `citas-web` en este incremento.

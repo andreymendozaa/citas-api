@@ -1,9 +1,19 @@
 # Riesgos y preguntas abiertas
 
-- Ambos repositorios trabajan en `develop`; `citas-web` contiene cambios locales aún no versionados que deben preservarse y verificarse.
-- No está definido el conjunto completo de estados y transiciones de citas.
-- Falta estrategia de exclusión concurrente de slots.
-- Falta política de zona horaria y formato temporal.
+- ~~`citas-web` contiene cambios locales aún no versionados~~ — resuelto: todo está versionado y empujado a `develop` (2026-09-30).
+- ~~No está definido el conjunto de estados y transiciones~~ — resuelto: catálogo sembrado en V2/V3 y transiciones centralizadas en `SchedulingJdbcAdapter`.
+- ~~Falta estrategia de exclusión concurrente de slots~~ — resuelto: asignación condicional transaccional, probada en `concurrentReservationsProduceExactlyOneAppointmentAndOneConflict`.
+- ~~Falta política de zona horaria~~ — resuelto: reloj de negocio `America/Bogota`.
+- (2026-09-30) Cancelación y reprogramación (HU-026 a 028) sin pruebas dedicadas: una regresión en la liberación o el intercambio de slots no sería detectada por la suite actual.
+- (2026-09-30) Brechas funcionales abiertas:
+  - afiliación posterior al registro (HU-011);
+  - catálogo de estados de reprogramación (HU-003);
+  - filtro por tipo de cita (HU-021);
+  - edición de especialidades y reasignación de profesionales en la UI (HU-014/016);
+  - OpenAPI (HU-004);
+  - Actuator.
+- (2026-09-30) `main` no se ha actualizado desde S2 en ninguno de los tres repositorios; el merge `develop → main` es entregable de S4/S6.
+- (2026-09-30) Repositorio raíz `citas` publicado pese a la restricción de dos repos públicos y a "No inicializar Git en la raíz" (`AGENTS.md`). Pendiente de decisión del usuario.
 - Es ambiguo si reservas `REQUESTED` o reprogramaciones `PENDING` bloquean la edición de bloques.
 - Falta lista completa de catálogos fijos y semillas.
 - Falta política de afiliación activa/histórica.

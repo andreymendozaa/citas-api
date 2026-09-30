@@ -2,7 +2,7 @@
 id: HU-016
 tipo: historia-de-usuario
 titulo: "Asignar especialidades al profesional"
-estado: Aprobada
+estado: En desarrollo
 epica: "[[EP-003-administracion-de-catalogos-y-profesionales]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 3"
@@ -46,10 +46,11 @@ La relación es N:M; se requiere exactamente la marcación primaria que indique 
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `AuthIntegrationTest.s3AppointmentRoutesKeepGeneralAndSpecializedContracts` (dos especialidades); `SchedulingServiceIntegrationTest.listsProfessionalsWithTheirActiveAssignments` | Un profesional admite varias especialidades. |
+| CA-02 | PENDIENTE | `PUT /admin/professionals/{id}/specialties` recibe `primarySpecialtyId` | **Falta** prueba de la primaria. La UI toma la primera especialidad marcada, sin selector explícito ni edición posterior. |
+| CA-03 / DoD | PARCIAL | `rejectsPastOverlappingAndUnavailableSchedulingConfiguration` (especialidad inactiva) | **Falta** prueba con especialidad no asociada al profesional. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - La unicidad exacta de primaria se justificará en modelo/contrato.

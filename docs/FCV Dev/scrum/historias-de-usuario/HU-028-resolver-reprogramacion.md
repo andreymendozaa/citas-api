@@ -2,7 +2,7 @@
 id: HU-028
 tipo: historia-de-usuario
 titulo: "Resolver reprogramación"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-006-ciclo-de-vida-de-citas-y-reprogramaciones]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 5"
@@ -46,10 +46,11 @@ Al aprobar libera slots antiguos, asigna nuevos y actualiza cita; al rechazar li
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PARCIAL | `AppointmentEventsIntegrationTest` (ejecuta la aprobación sin afirmar franjas) | **Falta** prueba del intercambio de franjas. |
+| CA-02 | PARCIAL | Validación manual 2026-09-30 (rechazo con motivo desde la bandeja; cita original intacta) | **Falta** prueba automatizada de liberación. |
+| CA-03 / DoD | PENDIENTE | Guardas en `SchedulingJdbcAdapter.decideReschedule`; rol por `@PreAuthorize` | **Falta** prueba de actor no ADMIN y solicitud no pendiente. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Pendiente de aprobación` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - Tras rechazo USER conserva o cancela la cita mediante [[HU-026-cancelar-cita]].

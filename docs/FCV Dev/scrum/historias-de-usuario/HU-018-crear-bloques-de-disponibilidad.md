@@ -2,7 +2,7 @@
 id: HU-018
 tipo: historia-de-usuario
 titulo: "Crear bloques de disponibilidad"
-estado: Aprobada
+estado: En desarrollo
 epica: "[[EP-004-disponibilidad-del-profesional]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 4"
@@ -46,10 +46,11 @@ Puede crear múltiples bloques (por ejemplo mañana/tarde); cada uno se discreti
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `retainsConsecutiveSlotsAndReleasesThemAfterAdministrativeRejection` (bloque → slots de 30 min); `schedulingApi.test.ts` (contrato de bloques) |  |
+| CA-02 | PASS | `rejectsPastOverlappingAndUnavailableSchedulingConfiguration` (pasado, solapado, sede no habilitada) |  |
+| CA-03 / DoD | PENDIENTE | — | **Falta** prueba de dos franjas el mismo día sin exponer el intervalo intermedio. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - La representación interna de slots se decide en [[HU-002-modelar-persistencia-3fn]].

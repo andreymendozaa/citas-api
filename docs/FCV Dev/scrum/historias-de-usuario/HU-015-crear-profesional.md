@@ -2,7 +2,7 @@
 id: HU-015
 tipo: historia-de-usuario
 titulo: "Crear profesional"
-estado: Aprobada
+estado: En desarrollo
 epica: "[[EP-003-administracion-de-catalogos-y-profesionales]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 3"
@@ -46,10 +46,11 @@ Los profesionales son creados por ADMIN y todos los datos del laboratorio son si
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `SchedulingServiceIntegrationTest` (`createProfessional`); `DashboardScreen.test.tsx` (vista ADMIN) | Crea identidad con rol PROFESSIONAL y datos profesionales sintéticos. |
+| CA-02 | PASS (código) | `@PreAuthorize("hasRole('ADMIN')")` en `POST /admin/professionals`; mecanismo de roles probado en `schedulingRoutesEnforceUserAdminAndProfessionalRoles` | Recomendado añadir prueba específica de `POST` con USER → `403`. |
+| CA-03 / DoD | PENDIENTE | `SchedulingService.createProfessional` es `@Transactional`; unicidad por restricciones de `users` | **Falta** prueba de email/documento duplicado sin registro parcial. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - Los campos de identidad se concretan en contrato, sin contradecir RF-01/RF-07.

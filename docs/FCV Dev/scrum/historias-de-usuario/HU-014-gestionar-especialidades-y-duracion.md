@@ -2,7 +2,7 @@
 id: HU-014
 tipo: historia-de-usuario
 titulo: "Gestionar especialidades y duración"
-estado: Aprobada
+estado: En desarrollo
 epica: "[[EP-003-administracion-de-catalogos-y-profesionales]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 3"
@@ -47,10 +47,11 @@ El profesional no puede sobrescribir la duración de una especialidad.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PARCIAL | `SchedulingJdbcAdapter.createSpecialty/updateSpecialty` → `validateDuration`; la UI ADMIN solo ofrece 30/60 | Regla implementada. **Falta** prueba que rechace una duración distinta de 30/60 en alta y en `PATCH`. |
+| CA-02 | PASS | `SchedulingServiceIntegrationTest.retainsConsecutiveSlotsAndReleasesThemAfterAdministrativeRejection`; `AuthIntegrationTest.s3AppointmentRoutesKeepGeneralAndSpecializedContracts` | La duración proviene del catálogo (60 min → 2 slots). |
+| CA-03 / DoD | PASS | `SchedulingServiceIntegrationTest.rejectsPastOverlappingAndUnavailableSchedulingConfiguration`; no existe ruta `DELETE` | Especialidad inactiva impide la disponibilidad; baja solo lógica. Observación: la UI no permite editar nombre/duración aunque el `PATCH` lo soporta. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - Medicina General debe estar representada por el catálogo aprobado.

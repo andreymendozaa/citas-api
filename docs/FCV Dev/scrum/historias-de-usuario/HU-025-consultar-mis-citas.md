@@ -2,7 +2,7 @@
 id: HU-025
 tipo: historia-de-usuario
 titulo: "Consultar mis citas"
-estado: Pendiente de aprobación
+estado: Completada
 epica: "[[EP-006-ciclo-de-vida-de-citas-y-reprogramaciones]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 5"
@@ -29,9 +29,9 @@ Debe mostrar sede, profesional, especialidad, fecha/hora, duración, estado y mo
 ## Esfuerzo
 **Nivel:** Medio. **Justificación de dificultad:** combina filtros, ownership y representación de estados/auditoría.
 ## Tareas de desarrollo
-- [ ] **T-01 — Definir consulta/detalle.** Dificultad: Medio. Acordar filtros y campos obligatorios.
-- [ ] **T-02 — Aplicar ownership y composición.** Dificultad: Medio. Obtener relaciones sin exponer citas ajenas.
-- [ ] **T-03 — Entregar pantalla/pruebas.** Dificultad: Medio. Cubrir filtros, rechazo y aislamiento.
+- [x] **T-01 — Definir consulta/detalle.** Dificultad: Medio. Acordar filtros y campos obligatorios.
+- [x] **T-02 — Aplicar ownership y composición.** Dificultad: Medio. Obtener relaciones sin exponer citas ajenas.
+- [x] **T-03 — Entregar pantalla/pruebas.** Dificultad: Medio. Cubrir filtros, rechazo y aislamiento.
 ## Criterios de aceptación
 ### CA-01 — Datos mínimos
 **Dado** citas propias, **cuando** USER las consulta, **entonces** ve sede, profesional, especialidad, fecha/hora, duración y estado.
@@ -40,15 +40,16 @@ Debe mostrar sede, profesional, especialidad, fecha/hora, duración, estado y mo
 ### CA-03 — Ownership
 **Dado** un USER, **cuando** intenta consultar detalle de cita ajena, **entonces** no recibe sus datos.
 ## Definition of Done
-- [ ] CA-01 a CA-03 probados en REST/ownership y cliente aplicable.
-- [ ] Contrato no expone información fuera del PRD; trazabilidad actualizada.
+- [x] CA-01 a CA-03 probados en REST/ownership y cliente aplicable.
+- [x] Contrato no expone información fuera del PRD; trazabilidad actualizada.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `AuthIntegrationTest.s3AppointmentRoutesKeepGeneralAndSpecializedContracts` (`/appointments/mine`); `DashboardScreen.test.tsx` | Profesional, especialidad, duración, estado, sede y fecha/hora. |
+| CA-02 | PASS | mismo test (filtros `status`/`date`, `rejectionReason`); `schedulingApi.test.ts` |  |
+| CA-03 / DoD | PASS | mismo test (otro USER recibe lista vacía); `AppointmentHistoryIntegrationTest` (historial ajeno → `404`) |  |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Pendiente de aprobación` → `Completada`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - Las pantallas se incorporan al cliente sin prescribir framework.

@@ -2,7 +2,7 @@
 id: HU-022
 tipo: historia-de-usuario
 titulo: "Reservar cita general"
-estado: Aprobada
+estado: Completada
 epica: "[[EP-005-busqueda-y-reserva-de-citas]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 4"
@@ -29,9 +29,9 @@ La disponibilidad se debe revalidar en la confirmación para impedir doble reser
 ## Esfuerzo
 **Nivel:** Alto. **Justificación de dificultad:** exige operación atómica de disponibilidad, estado y auditoría.
 ## Tareas de desarrollo
-- [ ] **T-01 — Definir comando/resultado de reserva.** Dificultad: Medio. Acordar datos y errores de disponibilidad.
-- [ ] **T-02 — Aplicar reserva atómica.** Dificultad: Alto. Revalidar slots y persistir cita/estado/historial.
-- [ ] **T-03 — Integrar confirmación/pruebas.** Dificultad: Alto. Cubrir éxito, carrera y slot ya ocupado.
+- [x] **T-01 — Definir comando/resultado de reserva.** Dificultad: Medio. Acordar datos y errores de disponibilidad.
+- [x] **T-02 — Aplicar reserva atómica.** Dificultad: Alto. Revalidar slots y persistir cita/estado/historial.
+- [x] **T-03 — Integrar confirmación/pruebas.** Dificultad: Alto. Cubrir éxito, carrera y slot ya ocupado.
 ## Criterios de aceptación
 ### CA-01 — Aprobación automática
 **Dado** Medicina General, profesional y franja aún disponible, **cuando** USER confirma, **entonces** se crea una cita `APPROVED` sin acción ADMIN.
@@ -40,16 +40,17 @@ La disponibilidad se debe revalidar en la confirmación para impedir doble reser
 ### CA-03 — Trazabilidad de estado
 **Dado** una reserva exitosa, **cuando** se consulta su historial, **entonces** consta el cambio a `APPROVED` con fuente/fecha aplicables.
 ## Definition of Done
-- [ ] CA-01 a CA-03 probados, incluida concurrencia/integración de persistencia relevante.
-- [ ] Contrato, cliente, migración/índices aplicables y auditoría verificables.
-- [ ] Trazabilidad Scrum actualizada.
+- [x] CA-01 a CA-03 probados, incluida concurrencia/integración de persistencia relevante.
+- [x] Contrato, cliente, migración/índices aplicables y auditoría verificables.
+- [x] Trazabilidad Scrum actualizada.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `AuthIntegrationTest.s3AppointmentRoutesKeepGeneralAndSpecializedContracts`; `BookAppointmentModal.test.tsx` (confirmación aprobada) | `APPROVED` sin acción ADMIN. |
+| CA-02 | PASS | `SchedulingServiceIntegrationTest.concurrentReservationsProduceExactlyOneAppointmentAndOneConflict`; `BookAppointmentModal.test.tsx` (409) | Red → Green documentado en `EVIDENCIAS_Y_TRAZABILIDAD.md`. |
+| CA-03 / DoD | PASS | mismo test concurrente (historial `APPROVED`/`SYSTEM`); `AppointmentHistoryIntegrationTest` |  |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `Completada`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - Medicina General depende de la especialidad/catálogo acordado.

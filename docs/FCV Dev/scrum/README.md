@@ -1,13 +1,14 @@
 ---
 tipo: indice-scrum
-estado: Pendiente de aprobación
+estado: Vigente
+actualizado: 2026-09-30
 ---
 
 # Mapa Scrum / Spec-Driven Development — Sistema de citas
 
 ## Propósito y límites
 
-Este mapa convierte el PRD v1 y las restricciones autorizadas en trabajo secuencial y verificable. El usuario aprobó el 2026-09-17 el corte backend de HU-001/002/004/005/006/007 y el seed parcial de roles de HU-003; las demás HU requieren revisión explícita. El contrato de autenticación está en la LLM Wiki; el framework web sigue sin aprobación.
+Este mapa convierte el PRD v1 y las restricciones autorizadas en trabajo secuencial y verificable. El usuario aprobó el 2026-09-17 el corte backend de HU-001/002/004/005/006/007 y el seed parcial de roles de HU-003; las demás HU requieren revisión explícita. El contrato de autenticación está en la LLM Wiki; el framework web sigue sin aprobación. *(Texto original del 2026-09-17; el estado vigente está en "Estado auditado · 2026-09-30".)*
 
 ## Arquitectura y supuestos constatados
 
@@ -19,6 +20,42 @@ Este mapa convierte el PRD v1 y las restricciones autorizadas en trabajo secuenc
 ## Registro S4 — cierre técnico sin cierre de HU · 2026-09-29
 
 El corte S3 conserva sus rutas y la BD Flyway V1/V2 sin modificación. Las pruebas verificadas son 19 Maven y 16 Vitest, más `npm run lint` y `npm run build`. Se comprobó concurrencia, reglas de slots, aprobación/rechazo e historial, autorizaciones, profesional/sede/especialidad inválidos, contratos de formularios para USER, ADMIN y PROFESSIONAL, y las rutas S3 de reserva general/especializada y decisión ADMIN mediante MockMvc. El caso rojo de concurrencia quedó verde tras la protección transaccional de los slots. Los endpoints de oferta y agenda se consumen desde React sin datos simulados; `GET /admin/professionals` no devuelve datos de acceso. El Verifier reutilizable se aplica justo después de cada Prompt antes de avanzar al siguiente. Este registro no marca HU-003, HU-004, HU-011 ni HU-014 a HU-024 como completadas: sus CA/DoD permanecen sujetos a la auditoría integral.
+
+## Estado auditado · 2026-09-30
+
+El usuario solicitó una auditoría integral de CA/DoD contra el código y las pruebas reales, para poner al día la trazabilidad de S3/S4. Criterio aplicado:
+- un CA es **PASS** solo con prueba automatizada o propiedad estructural (por ejemplo, ausencia de ruta de escritura);
+- lo verificado únicamente por revisión de código o de forma manual queda **PARCIAL/PENDIENTE**;
+- una HU pasa a `Completada` solo si ningún CA queda pendiente.
+
+La evidencia de cada CA está en la tabla de cada HU.
+
+| Estado | Cantidad | HU |
+|---|---|---|
+| `Completada` | 17 | HU-001, 002, 005, 006, 007, 008, 009, 010, 012, 013, 017, 022, 025, 029, 030, 031, 032 |
+| `En desarrollo` | 14 | HU-003, 004, 014, 015, 016, 018, 019, 020, 021, 023, 024, 026, 027, 028 |
+| `Aprobada` (sin iniciar) | 1 | HU-011 |
+| `En progreso` | 1 | HU-033 |
+| `Pendiente de aprobación` | 3 | HU-034, 035, 036 |
+
+Causas de que las 14 HU sigan `En desarrollo`:
+- **Falta de pruebas dedicadas.** Las guardas existen en el código, pero no hay una prueba que las verifique:
+  - HU-014: rechazo de duración ≠ 30/60.
+  - HU-015: unicidad sin registro parcial.
+  - HU-016: especialidad primaria y especialidad no asociada.
+  - HU-018: dos franjas el mismo día.
+  - HU-019: bloque ajeno, pasado o comprometido.
+  - HU-020: filtros de calendario.
+  - HU-023: historial inicial `REQUESTED`/`USER`.
+  - HU-024: rechazo sin motivo y estado inválido.
+  - HU-026 a HU-028: cancelación y reprogramación, cuyas únicas pruebas son indirectas (`AppointmentEventsIntegrationTest`, `InboxIntegrationTest`).
+- **Huecos funcionales:**
+  - HU-003: catálogo de estados de reprogramación no expuesto.
+  - HU-021: falta el filtro por tipo general/especializada (RF-10).
+  - HU-016: sin selector de especialidad primaria en la UI.
+- **Documentación de contrato:** HU-004 queda pendiente de la especificación OpenAPI (S5).
+
+HU-025 a HU-028 pasan de `Pendiente de aprobación` a su estado auditado porque ya estaban implementadas y el usuario solicitó su auditoría el 2026-09-30.
 
 ## Épicas
 
@@ -45,10 +82,10 @@ Los sprints son incrementos funcionales secuenciales, no estimaciones de duraci�
 
 ## Decisiones e incógnitas que requieren revisión
 
-- Seleccionar React o Angular después del flujo Stitch/AI Studio; las HU de cliente no presuponen uno.
-- Diseñar y aprobar el contrato REST antes de que las HU consumidoras lo usen; no se han definido rutas ni formatos.
-- Definir de forma consistente los valores concretos de catálogos fijos al realizar el seed, manteniendo lo que el PRD exige.
-- Precisar el canal seguro de exposición controlada del token de recuperación en desarrollo antes de implementar [[HU-008-solicitar-recuperacion-de-contrasena]].
+- ~~Seleccionar React o Angular~~ — resuelto: React 19 + TypeScript + Vite. Sigue pendiente la evidencia de aprobación visual Stitch/AI Studio.
+- ~~Diseñar y aprobar el contrato REST~~ — resuelto por incremento en la LLM Wiki (`contracts.md`). Falta publicar OpenAPI ([[HU-004-definir-contrato-rest-inicial]]).
+- ~~Definir los valores de catálogos fijos~~ — sembrados en V1/V2/V3. Falta exponer los estados de reprogramación ([[HU-003-publicar-catalogos-fijos]]).
+- ~~Canal seguro del token de recuperación~~ — resuelto: buzón local ADMIN bajo perfil `local` ([[HU-008-solicitar-recuperacion-de-contrasena]]).
 - Las automatizaciones de [[EP-008-cliente-web-y-automatizaciones-posteriores]] son posteriores al núcleo y dependen de la instancia/credenciales del trainer; sus JSON vivirán en `automations/n8n/` sin credenciales.
 
 ## Regla de selección para S2, S3 y S4

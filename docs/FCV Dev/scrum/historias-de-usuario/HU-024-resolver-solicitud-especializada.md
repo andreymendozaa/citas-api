@@ -2,7 +2,7 @@
 id: HU-024
 tipo: historia-de-usuario
 titulo: "Resolver solicitud especializada"
-estado: Aprobada
+estado: En desarrollo
 epica: "[[EP-005-busqueda-y-reserva-de-citas]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 4"
@@ -46,10 +46,11 @@ El rechazo exige motivo; aprobar cambia a `APPROVED`, rechazar a `REJECTED` y li
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `SchedulingServiceIntegrationTest.administrativeApprovalRetainsSlotsAndWritesHistory`; validación manual en Chrome 2026-09-30 (bandeja) |  |
+| CA-02 | PASS | `retainsConsecutiveSlotsAndReleasesThemAfterAdministrativeRejection` (motivo, slots liberados, historial ADMIN); `s3AppointmentRoutes…` (`rejectionReason`) |  |
+| CA-03 / DoD | PENDIENTE | Guardas en `SchedulingJdbcAdapter.decide`; rol por `@PreAuthorize` | **Falta** prueba de rechazo sin motivo, cita no `REQUESTED` y actor no ADMIN. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - La bandeja se especifica en [[HU-031-consultar-bandeja-administrativa]].

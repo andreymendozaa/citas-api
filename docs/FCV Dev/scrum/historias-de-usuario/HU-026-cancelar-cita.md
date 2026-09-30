@@ -2,7 +2,7 @@
 id: HU-026
 tipo: historia-de-usuario
 titulo: "Cancelar cita"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-006-ciclo-de-vida-de-citas-y-reprogramaciones]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 5"
@@ -46,10 +46,11 @@ Una cancelada no se reactiva directamente y debe registrarse historial.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PARCIAL | `AppointmentEventsIntegrationTest` (cancelación → `CANCELLED`, fuente USER) | **Falta** prueba de liberación de slots. |
+| CA-02 | PENDIENTE | Guarda en `SchedulingJdbcAdapter.cancel` (propia, futura, no terminal → `409`) | **Falta** prueba. |
+| CA-03 / DoD | PARCIAL | No existe ruta de reactivación (estructural) | **Falta** prueba de que el historial conserva la cancelación. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Pendiente de aprobación` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - El catálogo determina cuáles estados son terminales.

@@ -2,7 +2,7 @@
 id: HU-021
 tipo: historia-de-usuario
 titulo: "Buscar disponibilidad"
-estado: Aprobada
+estado: En desarrollo
 epica: "[[EP-005-busqueda-y-reserva-de-citas]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 4"
@@ -46,11 +46,12 @@ Solo se muestran horarios que permiten todos los slots necesarios; tipo general/
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PARCIAL | `GET /availability?locationId&specialtyId&professionalId&date`; `s3AppointmentRoutesKeepGeneralAndSpecializedContracts`; `BookAppointmentModal.test.tsx` | **Falta** el filtro por tipo general/especializada exigido por RF-10. |
+| CA-02 | PASS | `retainsConsecutiveSlotsAndReleasesThemAfterAdministrativeRejection` (60 min → inicio con 2 slots) |  |
+| CA-03 / DoD | PASS | `rejectsPastOverlappingAndUnavailableSchedulingConfiguration`, `rejectsReservationsForAnUnavailableProfessionalOrLocation` | Especialidad inactiva y profesional/sede no habilitados no se ofrecen. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - El tratamiento de concurrencia se prueba definitivamente en las HU de reserva.
 - La afiliación es un dato administrativo opcional y no condiciona búsqueda ni reserva.

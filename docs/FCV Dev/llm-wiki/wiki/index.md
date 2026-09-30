@@ -9,7 +9,13 @@ Implementado y verificado:
   - Incremento 1: recuperación y restablecimiento HU-008/009, perfil HU-010, EPS y planes HU-012/013.
   - Incremento 3: agenda profesional HU-029, cierre HU-030, bandeja unificada HU-031, auditoría HU-032, preparación n8n.
 
-S4 queda cerrado. Siguiente hito: S5 (Swagger, `current-state.md`, webhook n8n real). Pantallas de S4 sin aprobación visual Stitch: ver [Riesgos](risks-open-questions.md).
+S4 queda cerrado. Pantallas de S4 sin aprobación visual Stitch: ver [Riesgos](risks-open-questions.md).
+
+Auditoría del 2026-09-30:
+- Estado global: 17 HU `Completada` y 14 `En desarrollo` (sobre todo por falta de pruebas dedicadas en S3, cancelación y reprogramación).
+- Brechas funcionales y entregables S5/S6 pendientes: ver [Trazabilidad](traceability.md).
+
+Siguiente hito: cerrar esas brechas y luego S5 (Swagger, `current-state.md`, webhook n8n real).
 
 ## Lectura recomendada
 

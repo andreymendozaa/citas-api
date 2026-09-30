@@ -48,11 +48,12 @@ Roles, estados de cita, estados de reprogramación, regímenes y sedes son de so
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PARCIAL | `GET /api/v1/catalogs/{locations|appointment-statuses|roles|regimes|plans}` (`SchedulingJdbcAdapter.catalog`); `AuthIntegrationTest.schedulingRoutesEnforceUserAdminAndProfessionalRoles` (solo `locations`) | Seeds en V1/V2/V3. **Falta**: exponer los estados de reprogramación (sembrados en V3 sin endpoint) y pruebas del contenido de cada catálogo. |
+| CA-02 | PARCIAL | Seed `V2__scheduling_core.sql`; validación manual en Chrome 2026-09-30 | HIC e ICV visibles en filtros y citas. **Falta** prueba automatizada del contenido del catálogo de sedes. |
+| CA-03 / DoD | PASS (estructural) | Revisión de `SchedulingController`: solo existe `GET /catalogs/{catalog}` | No hay operación de escritura sobre catálogos fijos. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado se mantiene `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - Los valores de estados deberán alinearse con el catálogo fijo aprobado.
 - 2026-09-17: se aprobó únicamente el seed de roles `USER`, `PROFESSIONAL`, `ADMIN` como dependencia de identidad. La publicación REST de roles y los demás catálogos quedan pendientes; HU-003 conserva su estado.

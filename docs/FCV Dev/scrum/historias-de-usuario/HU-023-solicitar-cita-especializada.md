@@ -2,7 +2,7 @@
 id: HU-023
 tipo: historia-de-usuario
 titulo: "Solicitar cita especializada"
-estado: Aprobada
+estado: En desarrollo
 epica: "[[EP-005-busqueda-y-reserva-de-citas]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 4"
@@ -46,10 +46,11 @@ La solicitud nace `REQUESTED` y retiene slots para evitar doble reserva.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `retainsConsecutiveSlotsAndReleasesThemAfterAdministrativeRejection` (`REQUESTED`, slots retenidos); `s3AppointmentRoutesKeepGeneralAndSpecializedContracts` |  |
+| CA-02 | PASS | mismo test (segunda reserva sobre la franja rechazada con "Franja"); protección transaccional probada en `concurrentReservations…` |  |
+| CA-03 / DoD | PARCIAL | mismo test (historial con 2 registros tras el rechazo) | **Falta** afirmar estado `REQUESTED` con fuente `USER` en el registro inicial. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
 ## Notas y decisiones
 - La reserva queda liberada al rechazo mediante [[HU-024-resolver-solicitud-especializada]].

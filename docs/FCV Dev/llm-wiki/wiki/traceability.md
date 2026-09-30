@@ -19,3 +19,39 @@ El prototipo `citas-web/portal-de-citas.zip` se importó como React/Vite y se in
 ## HECHO — 2026-09-29 · Cierre técnico S2/S3 verificado
 
 El servicio de aplicación de agenda depende de `Ports.Scheduling`; las operaciones JDBC viven en `SchedulingJdbcAdapter`. El reloj de negocio se configuró con `America/Bogota`. La suite backend verificó 19 pruebas, incluidas reserva concurrente, aprobación/rechazo con historial, retención/liberación de slots, edición/eliminación de bloques futuros, profesional/sede/especialidad inválidos, catálogo tipado de profesionales, autorización de rutas S3 y compatibilidad MockMvc para reserva general/especializada y decisión ADMIN. El frontend verificó 16 pruebas, `lint` y `build`, incluyendo los contratos de reserva y bloques, adaptación de slots API, mensajes `403`/`409`, confirmación `APPROVED` y pantallas ADMIN/PROFESSIONAL. El caso rojo de concurrencia pasó a verde tras proteger la asignación condicional de slots; el hook frontend y backend registran FAIL/PASS con secretos sintéticos. El Verifier reutilizable se ejecutó inmediatamente después de cada Prompt y registró su decisión PASS/FAIL. Este cierre técnico no declara completadas HU-003, HU-004, HU-011 ni HU-014 a HU-024: todavía requieren la cobertura y evidencia integral exigidas por sus DoD.
+
+## HECHO — 2026-09-30 · Revisión integral de requerimientos (PRD, restricciones, guía S2–S6, Scrum)
+
+Revisión solicitada por el usuario sobre `citas`, `citas-api` y `citas-web`, contrastando la documentación con el código y las pruebas reales. Evidencia base: Maven 40/40 y Vitest 34/34 en `develop`.
+
+**Requerimientos funcionales del PRD.**
+- Completos (16): RF-01, 02, 03, 08, 09, 11, 12, 13, 14, 15, 16, 17, 18 y 19.
+- Parciales:
+  - RF-04: la afiliación solo se elige al registrarse, sin consulta ni cambio posterior (HU-011).
+  - RF-05: los estados de reprogramación están sembrados pero no se exponen.
+  - RF-06: la UI de especialidades no edita nombre ni duración.
+  - RF-07: la UI no reasigna especialidades o sedes tras el alta ni elige la especialidad primaria.
+  - RF-10: falta el filtro por tipo general/especializada.
+  - RF-20: falta publicar OpenAPI.
+- RN-01 a RN-12 y la seguridad mínima están cubiertas.
+- Desviación documentada: RF-19 lista las fuentes `SYSTEM/USER/ADMIN`, y el cierre de atención usa además `PROFESSIONAL`.
+- Recomendación de `RESTRICCIONES_TECNICAS.md` no aplicada: Actuator health no está en el `pom.xml`.
+
+**Trazabilidad Scrum.** Se auditaron CA/DoD de HU-003, HU-004 y HU-014 a HU-028 con este criterio:
+- PASS solo con prueba automatizada o propiedad estructural;
+- lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE.
+
+Resultado:
+- HU-017, HU-022 y HU-025 pasan a `Completada`.
+- Las otras 14 quedan `En desarrollo`, con el faltante explícito en su tabla de evidencia.
+- Estado global: 17 `Completada`, 14 `En desarrollo`, 1 `Aprobada` (HU-011), 1 `En progreso` (HU-033), 3 `Pendiente de aprobación` (HU-034 a 036).
+- Hallazgo principal: la cancelación y la reprogramación (HU-026 a 028) solo tienen pruebas indirectas; el código implementa sus guardas, pero no hay pruebas dedicadas de slots, ownership ni estados inválidos.
+
+**Entregables S2–S6 pendientes.**
+- Evidencia de aprobación visual Stitch/AI Studio de todas las pantallas.
+- Evidencia del LOOP propio del estudiante (`LOOP_03`) y sus logs.
+- Merge `develop → main` en los tres repositorios: `main` está 12/16/8 commits atrás en `citas`/`citas-api`/`citas-web`.
+- WF-001 y WF-002 exportados en JSON: hoy solo existen especificaciones `.md` en `automations/n8n/`.
+- Evidencia de MCP, documento de riesgos residuales, Swagger, `current-state.md` y webhook real de n8n.
+
+**PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.
