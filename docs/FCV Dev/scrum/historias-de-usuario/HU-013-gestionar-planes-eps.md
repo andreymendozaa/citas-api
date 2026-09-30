@@ -2,7 +2,7 @@
 id: HU-013
 tipo: historia-de-usuario
 titulo: "Gestionar planes de EPS"
-estado: En desarrollo
+estado: Completada
 epica: "[[EP-003-administracion-de-catalogos-y-profesionales]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 3"
@@ -29,9 +29,9 @@ El plan depende de EPS y tampoco se borra físicamente si está referenciado.
 ## Esfuerzo
 **Nivel:** Medio. **Justificación de dificultad:** exige integridad referencial y gestión administrativa segura.
 ## Tareas de desarrollo
-- [ ] **T-01 — Definir contrato y relación plan-EPS.** Dificultad: Medio. Validar EPS existente/activa según regla aprobada.
-- [ ] **T-02 — Implementar baja lógica.** Dificultad: Medio. Preservar planes referenciados.
-- [ ] **T-03 — Entregar UI/pruebas.** Dificultad: Medio. Cubrir relación inválida, rol y consulta.
+- [x] **T-01 — Definir contrato y relación plan-EPS.** Dificultad: Medio. Validar EPS existente/activa según regla aprobada.
+- [x] **T-02 — Implementar baja lógica.** Dificultad: Medio. Preservar planes referenciados.
+- [x] **T-03 — Entregar UI/pruebas.** Dificultad: Medio. Cubrir relación inválida, rol y consulta.
 ## Criterios de aceptación
 ### CA-01 — Plan asociado
 **Dado** una EPS válida, **cuando** ADMIN crea o actualiza un plan, **entonces** el plan queda asociado a esa EPS.
@@ -40,17 +40,19 @@ El plan depende de EPS y tampoco se borra físicamente si está referenciado.
 ### CA-03 — Selección consistente
 **Dado** un consumidor de afiliación, **cuando** consulta planes de una EPS, **entonces** solo puede seleccionar planes válidos de ella conforme al contrato.
 ## Definition of Done
-- [ ] CA-01 a CA-03 probados en persistencia/REST y cliente aplicable.
-- [ ] Relación 3FN, migración aplicable y autorización ADMIN verificadas.
-- [ ] Trazabilidad Scrum actualizada.
+- [x] CA-01 a CA-03 probados en persistencia/REST y cliente aplicable.
+- [x] Relación 3FN, migración aplicable y autorización ADMIN verificadas.
+- [x] Trazabilidad Scrum actualizada.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
 | CA-01 | PASS (backend) | `InsuranceAdminIntegrationTest.epsPlanValidatesExistingActiveEpsAndRegime` | `POST /api/v1/admin/eps-plans` exige `epsId`/`regimeId` existentes; el plan creado queda asociado a la EPS indicada. |
 | CA-02 | PASS (backend) | `InsuranceAdminIntegrationTest.epsPlanValidatesExistingActiveEpsAndRegime` | Sin borrado físico; `PATCH .../active:false` conserva el registro y lo retira del catálogo público `GET /api/v1/catalogs/plans` (regresión de [[HU-011-gestionar-afiliacion]] verificada explícitamente). |
 | CA-03 / DoD | PASS (backend) | `InsuranceAdminIntegrationTest.epsPlanValidatesExistingActiveEpsAndRegime` | EPS inexistente o régimen inválido devuelven `404`; EPS inactiva devuelve `409`; código de plan duplicado dentro de la misma EPS devuelve `409`. Falta cliente (T-03). |
+| Frontend / T-03 | PASS | `InsuranceAdminTab.tsx`, `s4Screens.test.tsx` HU-013, `schedulingApi.test.ts`; `npm run lint`, `npm test` 34/34, `npm run build` en `citas-web`; validación manual en Chrome | Planes filtrados por EPS seleccionada; régimen desde `GET /catalogs/regimes`; creación bloqueada si no hay EPS activa seleccionada; baja lógica verificada en vivo. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
 - 2026-09-29 — Backend implementado y verificado (Maven 33/33 verde): `GET/POST/PATCH /api/v1/admin/eps-plans`, sin migración nueva (tabla `eps_plans` ya existía desde V2). Frontend pendiente para una ronda posterior.
+- 2026-09-30 — Frontend implementado y verificado en `citas-web` (pasada consolidada de S4 Incrementos 1 y 3): lint, 34/34 pruebas Vitest y build en verde, y flujo validado en Chrome contra el backend en Docker (perfil `local`). HU cerrada como `Completada`.
 ## Notas y decisiones
 - Confirmado: sin atributo comercial nuevo para el plan; solo `code`, `name`, `active` son editables por ADMIN además de la asociación `epsId`/`regimeId` fijada al crear.

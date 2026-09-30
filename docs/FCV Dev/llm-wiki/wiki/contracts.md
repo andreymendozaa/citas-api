@@ -54,7 +54,7 @@ Todos los recursos S3 usan `/api/v1`, JWT access en `Authorization: Bearer` y JS
 
 `citas-web` consume las cuatro operaciones de autenticación directamente con `VITE_API_URL` (valor local: `http://localhost:8080`). Envía `credentials: include` y `X-Requested-With: XMLHttpRequest` en login, refresh y logout. El access JWT permanece solo en memoria; el refresh se mantiene en cookie `HttpOnly` y se rota al restaurar la sesión. La interfaz no registra ni muestra tokens o contraseñas.
 
-El CORS permite exclusivamente `FRONTEND_ORIGIN`, métodos `POST`, `GET`, `OPTIONS`, encabezados `Content-Type`, `Authorization`, `X-Requested-With` y credenciales. La base de referencia ya existente utiliza `BIGINT` para usuarios, `roles.code` y `refresh_tokens`; Flyway hace baseline en versión 0 y `V1` es compatible con ese esquema 3FN.
+El CORS permite exclusivamente `FRONTEND_ORIGIN`, métodos `POST`, `GET`, `PUT`, `PATCH`, `DELETE`, `OPTIONS` (corregido 2026-09-30 contra `SecurityConfig.java`; la versión original de esta línea solo listaba `POST`, `GET`, `OPTIONS`), encabezados `Content-Type`, `Authorization`, `X-Requested-With` y credenciales. La base de referencia ya existente utiliza `BIGINT` para usuarios, `roles.code` y `refresh_tokens`; Flyway hace baseline en versión 0 y `V1` es compatible con ese esquema 3FN.
 
 ## DECISIÓN — 2026-09-29 · Consulta USER de Mis citas
 
@@ -91,3 +91,26 @@ Preparación para n8n: `GET /api/v1/admin/appointments/upcoming?from=&to=&locati
 Sin migración Flyway nueva: los estados `COMPLETED`/`NO_SHOW` ya estaban sembrados desde `V2__scheduling_core.sql`, y `appointment_status_history.change_source` no tiene `CHECK`/FK que restrinja sus valores.
 
 Evidencia: 40/40 pruebas Maven verdes (`ProfessionalOperationsIntegrationTest`, `AppointmentHistoryIntegrationTest`, `UpcomingAppointmentsIntegrationTest`, `AppointmentEventsIntegrationTest`, `InboxIntegrationTest`). **Frontend (`citas-web`) pendiente**: HU-029, HU-030, HU-031 y HU-032 quedan en `En desarrollo`, no `Completada`, hasta esa ronda.
+
+## DECISIÓN — 2026-09-30 · Frontend consolidado de S4 (Incrementos 1 y 3)
+
+`citas-web` consume sin cambios de contrato todos los endpoints de los Incrementos 1 y 3; `citas-api` no se modificó. Navegación: se conserva la máquina de estados sin router y se añaden pestañas por rol dentro del dashboard (USER: *Mis citas* | *Mi perfil*; PROFESSIONAL: *Agenda* | *Disponibilidad*; ADMIN: *Bandeja* | *Oferta* | *EPS y planes*).
+
+- Recuperación (HU-008/009): pantallas propias desde el login. El restablecimiento acepta el código por campo o por `?token=`, que se retira de la URL con `history.replaceState` al iniciar. El cliente de auth trata `202` sin cuerpo como éxito. Ninguna UI muestra tokens; en local el token se obtiene del buzón ADMIN por fuera de la interfaz.
+- Perfil (HU-010): `PATCH /users/me` envía solo `{phone}`; la identidad se muestra en solo lectura.
+- EPS y planes (HU-012/013): mismo patrón visual que especialidades; el régimen se lee de `GET /catalogs/regimes`.
+- Agenda y cierre (HU-029/030): Día/Semana (lunes-domingo) se traduce a `from`/`to`. Los botones de cierre aparecen solo cuando `endAt` ya pasó en hora Bogotá, como mejora de experiencia; la regla sigue siendo del backend.
+- Bandeja (HU-031): el cliente migra a `GET /admin/inbox` y deja de consumir `GET /admin/appointments/pending-specialized`, que sigue expuesto por compatibilidad. Las decisiones se enrutan por `type`: `SPECIALIZED` → `/admin/appointments/{id}/decision`, `RESCHEDULE` → `/admin/reschedule-requests/{id}/decision`.
+- Auditoría (HU-032): componente de historial de solo lectura, reutilizado por los tres roles; un `404` se muestra como "no disponible", sin distinguir inexistencia de falta de alcance.
+
+Diseño: **no existe referencia Stitch/AI Studio aprobada para estas pantallas**. Por decisión del usuario se extendió el estilo Tailwind ya presente (tarjetas `rounded-3xl`, acciones `blue-600`, tarjeta de autenticación del login); queda como deuda de aprobación visual.
+
+Evidencia: `npm run lint`, `npm test` (34/34, incluye `s4Screens.test.tsx`) y `npm run build` en verde. Además se validó manualmente en Chrome contra el backend en Docker con perfil `local`:
+- recuperación y restablecimiento con login posterior;
+- edición de teléfono;
+- creación y baja lógica de EPS y plan;
+- rechazo con motivo de una reprogramación y aprobación de una especializada desde la bandeja;
+- agenda semanal y cierre `COMPLETED`, con historial `PROFESSIONAL` verificado vía API;
+- historial visible como USER, PROFESSIONAL y ADMIN.
+
+HU-008, 009, 010, 012, 013, 029, 030, 031 y 032 pasan a `Completada`, y S4 queda cerrado.

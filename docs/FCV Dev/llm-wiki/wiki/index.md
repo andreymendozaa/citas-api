@@ -1,6 +1,15 @@
 # Índice de la LLM Wiki
 
-Última actualización: 2026-09-29. Identidad (HU-005/006/007), agendamiento S3 completo (HU-014 a HU-028) y, del backend de S4, los Incrementos 1 (recuperación/restablecimiento de contraseña HU-008/009, perfil HU-010, catálogos EPS HU-012/013) y 3 (agenda profesional HU-029, cierre HU-030, bandeja unificada HU-031, auditoría HU-032, preparación n8n) están implementados y verificados con Maven (40/40). El frontend de ambos bloques queda pendiente para una ronda posterior. S5 (Swagger, `current-state.md`, webhook n8n real) sigue sin implementar.
+Última actualización: 2026-09-30.
+
+Implementado y verificado:
+- Identidad (HU-005/006/007).
+- Agendamiento S3 completo (HU-014 a HU-028).
+- S4 completo en backend (Maven 40/40) y frontend (Vitest 34/34 y validación en Chrome), cubriendo:
+  - Incremento 1: recuperación y restablecimiento HU-008/009, perfil HU-010, EPS y planes HU-012/013.
+  - Incremento 3: agenda profesional HU-029, cierre HU-030, bandeja unificada HU-031, auditoría HU-032, preparación n8n.
+
+S4 queda cerrado. Siguiente hito: S5 (Swagger, `current-state.md`, webhook n8n real). Pantallas de S4 sin aprobación visual Stitch: ver [Riesgos](risks-open-questions.md).
 
 ## Lectura recomendada
 
