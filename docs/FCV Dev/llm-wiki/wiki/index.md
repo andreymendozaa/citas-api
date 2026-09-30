@@ -12,7 +12,7 @@ Implementado y verificado:
 S4 queda cerrado. Pantallas de S4 sin aprobación visual Stitch: ver [Riesgos](risks-open-questions.md).
 
 Auditoría del 2026-09-30:
-- Estado global: 20 HU `Completada` y 11 `En desarrollo`, sobre todo por falta de pruebas dedicadas en S3. Cancelación y reprogramación quedaron cubiertas el mismo día.
+- Estado global: 22 HU `Completada` y 9 `En desarrollo`, sobre todo por falta de pruebas dedicadas en S3. Cancelación, reprogramación y la decisión ADMIN quedaron cubiertas el mismo día, corrigiendo 4 errores 500.
 - Brechas funcionales y entregables S5/S6 pendientes: ver [Trazabilidad](traceability.md).
 
 Siguiente hito: cerrar esas brechas y luego S5 (Swagger, `current-state.md`, webhook n8n real).

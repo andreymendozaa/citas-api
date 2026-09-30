@@ -65,4 +65,10 @@ Resultado:
 - HU-026, HU-027 y HU-028 pasan a `Completada`.
 - Estado global: 20 `Completada` y 11 `En desarrollo`.
 
+**HECHO — segunda actualización · decisión de solicitudes especializadas.** Se añadió `SpecializedDecisionIntegrationTest` (3 casos). HU-023 CA-03 (historial inicial `REQUESTED`/`USER`) pasó directamente. HU-024 CA-03 reprodujo el mismo error 500 en `decide` para citas inexistentes, generales o ya resueltas. Se corrigió siguiendo Red → Green (`404`/`409`) y se verificó que no quedan consultas de fila única sin manejar.
+
+La prueba usa `@AfterEach` para resolver sus citas `REQUESTED` aunque falle: la ejecución Red no dejó residuos. Maven 51/51 en dos ejecuciones consecutivas.
+
+Estado global: 22 `Completada` y 9 `En desarrollo` (HU-003, 004, 014, 015, 016, 018, 019, 020, 021).
+
 **PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.

@@ -5,7 +5,7 @@
 - ~~Falta estrategia de exclusión concurrente de slots~~ — resuelto: asignación condicional transaccional, probada en `concurrentReservationsProduceExactlyOneAppointmentAndOneConflict`.
 - ~~Falta política de zona horaria~~ — resuelto: reloj de negocio `America/Bogota`.
 - ~~(2026-09-30) Cancelación y reprogramación (HU-026 a 028) sin pruebas dedicadas~~ — resuelto el mismo día con `AppointmentLifecycleIntegrationTest`.
-- (2026-09-30) `SchedulingJdbcAdapter.decide` (decisión de cita especializada, HU-024) mantiene el patrón `queryForMap` que causaba errores 500. Es probable que una cita inexistente o que ya no está `REQUESTED` responda 500 en lugar de `404`/`409`; debe confirmarse con la prueba pendiente de HU-024 CA-03.
+- ~~(2026-09-30) `SchedulingJdbcAdapter.decide` mantiene el patrón `queryForMap` que causaba errores 500~~ — confirmado y corregido el mismo día (`SpecializedDecisionIntegrationTest`). Ya no quedan `queryForMap` en el backend; solo `queryForObject` sobre `count(*)`, que siempre devuelve una fila.
 - (2026-09-30) La base de pruebas Maven es persistente y algunas suites asumen ser las únicas con citas `REQUESTED` (`pending()` con un solo elemento, `$[0]`). Cualquier prueba que deje una solicitud sin resolver rompe a las demás. Conviene hacer esas aserciones independientes de datos ajenos.
 - (2026-09-30) Brechas funcionales abiertas:
   - afiliación posterior al registro (HU-011);
