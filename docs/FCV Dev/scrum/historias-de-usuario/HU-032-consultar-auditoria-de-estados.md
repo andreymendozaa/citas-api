@@ -2,7 +2,7 @@
 id: HU-032
 tipo: historia-de-usuario
 titulo: "Consultar auditoría de estados"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-007-operacion-profesional-y-administrativa]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 6"
@@ -46,10 +46,11 @@ Cada cambio guarda cita, estado nuevo, actor cuando existe, fuente SYSTEM/USER/A
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS (backend) | `AppointmentHistoryIntegrationTest.historyRespectsOwnershipAcrossRolesAndIsInvisibleOutsideScope` | Cada transición ya centralizada (`reserve`, `cancel`, `decide`, `decideReschedule`, `closeAppointment`) registra cita, estado, actor cuando existe, fuente y fecha en `appointment_status_history`. |
+| CA-02 | PASS (backend) | Revisión de código | No existe ningún endpoint de escritura sobre `appointment_status_history`; solo se inserta internamente en cada transición. |
+| CA-03 / DoD | PASS (backend) | mismo test | `GET /api/v1/appointments/{id}/history`: USER dueño, PROFESSIONAL asignado y ADMIN acceden; USER ajeno, PROFESSIONAL no asignado y sin token → denegado (`404`/`401`, sin filtrar existencia). Falta cliente (T-03). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-29 — Backend implementado y verificado (Maven 40/40 verde): `GET /api/v1/appointments/{id}/history`. Frontend pendiente para una ronda posterior.
 ## Notas y decisiones
-- El rol exacto de lectura administrativa se concreta con el contrato aprobado.
+- Rol de lectura resuelto por contrato: los tres roles (`USER`, `PROFESSIONAL`, `ADMIN`) pueden leer, con ownership variable resuelta en la consulta (`admin` o `patient_user_id` o `professional.user_id`).

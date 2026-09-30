@@ -2,7 +2,7 @@
 id: HU-030
 tipo: historia-de-usuario
 titulo: "Cerrar atención"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-007-operacion-profesional-y-administrativa]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 6"
@@ -46,10 +46,11 @@ El PRD no permite que PROFESSIONAL haga otras decisiones de cita.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | Requiere regla aplicable. |
+| CA-01 | PASS (backend) | `ProfessionalOperationsIntegrationTest.closesAppointmentsWithGuardsAndHistory`, `closesAppointmentAsNoShow` | `POST /api/v1/professional/appointments/{id}/closure` registra `COMPLETED` o `NO_SHOW` sobre cita propia aplicable. |
+| CA-02 | PASS (backend) | mismo archivo | Cita ajena → `404`; cita no `APPROVED` o ya cerrada → `409`; cita aún no finalizada → `409`; `result` inválido → `400`. |
+| CA-03 / DoD | PASS (backend) | mismo archivo | Historial registra `change_source='PROFESSIONAL'` y `changed_by_user_id`. Falta cliente (T-03). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-29 — Backend implementado y verificado (Maven 40/40 verde): `POST /api/v1/professional/appointments/{id}/closure`. Frontend pendiente para una ronda posterior.
 ## Notas y decisiones
-- Pregunta abierta: definición de condición “aplicable”.
+- Condición “aplicable” resuelta por contrato (`S4.md`): cita propia, `APPROVED`, y `scheduledEndAt` ya transcurrido respecto al reloj `America/Bogota`.

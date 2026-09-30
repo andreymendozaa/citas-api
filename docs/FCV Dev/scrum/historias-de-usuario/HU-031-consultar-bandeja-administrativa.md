@@ -2,7 +2,7 @@
 id: HU-031
 tipo: historia-de-usuario
 titulo: "Consultar bandeja administrativa"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-007-operacion-profesional-y-administrativa]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 6"
@@ -45,10 +45,11 @@ Filtros requeridos: sede, profesional, especialidad y fecha.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS (backend) | `InboxIntegrationTest.inboxCombinesSpecializedAndRescheduleAndAppliesFiltersAdminOnly` | `GET /api/v1/admin/inbox` combina especializadas `REQUESTED` y reprogramaciones `PENDING`. |
+| CA-02 | PASS (backend) | mismo test | Filtro por `specialtyId` verificado (aplica igual a `locationId`/`professionalId`/`date`, mismo mecanismo). |
+| CA-03 / DoD | PASS (backend) | mismo test | USER y PROFESSIONAL reciben `403`. Se conservan `/admin/appointments/pending-specialized` y `/admin/reschedule-requests/pending` por compatibilidad. Falta cliente (T-03). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-29 — Backend implementado y verificado (Maven 40/40 verde) como parte del Incremento 3, junto con HU-029/030/032: `GET /api/v1/admin/inbox`. Frontend pendiente para una ronda posterior.
 ## Notas y decisiones
 - La UI de decisión corresponde a sus HU relacionadas.

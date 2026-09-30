@@ -30,6 +30,7 @@ class SchedulingController {
     record EpsPatch(@Size(max=150) String name,Boolean active) {}
     record EpsPlanRequest(@NotNull Long epsId,@NotNull Long regimeId,@NotBlank @Size(max=50) String code,@NotBlank @Size(max=150) String name) {}
     record EpsPlanPatch(@Size(max=150) String name,Boolean active) {}
+    record ClosureRequest(@NotBlank String result,@Size(max=500) String reason) {}
     private final SchedulingService scheduling; private final Ports.Passwords passwords;
     SchedulingController(SchedulingService scheduling, Ports.Passwords passwords){this.scheduling=scheduling;this.passwords=passwords;}
     @GetMapping("/catalogs/{catalog}") List<Map<String,Object>> catalog(@PathVariable String catalog){return scheduling.catalog(catalog);}
@@ -62,5 +63,10 @@ class SchedulingController {
     @GetMapping("/admin/eps-plans") @PreAuthorize("hasRole('ADMIN')") List<SchedulingService.EpsPlan> epsPlans(@RequestParam(required=false) Long epsId){return scheduling.epsPlans(epsId);}
     @PostMapping("/admin/eps-plans") @PreAuthorize("hasRole('ADMIN')") ResponseEntity<SchedulingService.EpsPlan> createEpsPlan(@Valid @RequestBody EpsPlanRequest r){return ResponseEntity.status(HttpStatus.CREATED).body(scheduling.createEpsPlan(r.epsId(),r.regimeId(),r.code(),r.name()));}
     @PatchMapping("/admin/eps-plans/{id}") @PreAuthorize("hasRole('ADMIN')") SchedulingService.EpsPlan patchEpsPlan(@PathVariable Long id,@Valid @RequestBody EpsPlanPatch r){return scheduling.updateEpsPlan(id,r.name(),r.active());}
+    @GetMapping("/professional/appointments") @PreAuthorize("hasRole('PROFESSIONAL')") List<SchedulingService.ProfessionalAppointment> professionalAppointments(Authentication a,@RequestParam(required=false) LocalDate from,@RequestParam(required=false) LocalDate to,@RequestParam(required=false) Long locationId){return scheduling.professionalAppointments(user(a),from,to,locationId);}
+    @PostMapping("/professional/appointments/{id}/closure") @PreAuthorize("hasRole('PROFESSIONAL')") SchedulingService.Appointment closeAppointment(Authentication a,@PathVariable Long id,@Valid @RequestBody ClosureRequest r){return scheduling.closeAppointment(user(a),id,r.result().trim().toUpperCase(Locale.ROOT),r.reason());}
+    @GetMapping("/appointments/{id}/history") @PreAuthorize("hasAnyRole('USER','PROFESSIONAL','ADMIN')") List<SchedulingService.AppointmentHistoryEntry> history(Authentication a,@PathVariable Long id){boolean admin=a.getAuthorities().stream().anyMatch(g->g.getAuthority().equals("ROLE_ADMIN"));return scheduling.history(user(a),admin,id);}
+    @GetMapping("/admin/appointments/upcoming") @PreAuthorize("hasRole('ADMIN')") List<SchedulingService.UpcomingAppointment> upcoming(@RequestParam(required=false) LocalDate from,@RequestParam(required=false) LocalDate to,@RequestParam(required=false) Long locationId){return scheduling.upcoming(from,to,locationId);}
+    @GetMapping("/admin/inbox") @PreAuthorize("hasRole('ADMIN')") List<SchedulingService.InboxItem> inbox(@RequestParam(required=false) Long locationId,@RequestParam(required=false) Long professionalId,@RequestParam(required=false) Long specialtyId,@RequestParam(required=false) LocalDate date){return scheduling.inbox(locationId,professionalId,specialtyId,date);}
     private Long user(Authentication a){try{return Long.valueOf(a.getName());}catch(Exception e){throw new IllegalStateException("Principal inválido");}}
 }

@@ -23,6 +23,10 @@ public class SchedulingService {
     public record PendingAppointment(Long id, String patientName, String professionalName, String specialtyName, String locationName, LocalDateTime startAt, LocalDateTime endAt, int durationMinutes) {}
     public record Eps(Long id, String code, String name, boolean active) {}
     public record EpsPlan(Long id, Long epsId, Long regimeId, String code, String name, boolean active) {}
+    public record ProfessionalAppointment(Long id, String patientName, Long specialtyId, String specialtyName, Long locationId, String locationName, LocalDateTime startAt, LocalDateTime endAt, int durationMinutes, String reason) {}
+    public record AppointmentHistoryEntry(Long id, String status, Long changedByUserId, String changeSource, String reason, LocalDateTime changedAt) {}
+    public record UpcomingAppointment(Long id, String patientName, String patientPhone, String professionalName, String specialtyName, Long locationId, String locationName, LocalDateTime startAt, LocalDateTime endAt) {}
+    public record InboxItem(String type, Long id, Long appointmentId, String patientName, String professionalName, String specialtyName, Long locationId, String locationName, LocalDateTime startAt, LocalDateTime endAt) {}
 
     private final Ports.Scheduling scheduling;
 
@@ -60,4 +64,10 @@ public class SchedulingService {
     public List<EpsPlan> epsPlans(Long epsId) { return scheduling.epsPlans(epsId); }
     @Transactional public EpsPlan createEpsPlan(Long epsId, Long regimeId, String code, String name) { return scheduling.createEpsPlan(epsId, regimeId, code, name); }
     @Transactional public EpsPlan updateEpsPlan(Long id, String name, Boolean active) { return scheduling.updateEpsPlan(id, name, active); }
+
+    public List<ProfessionalAppointment> professionalAppointments(Long userId, LocalDate from, LocalDate to, Long locationId) { return scheduling.professionalAppointments(userId, from, to, locationId); }
+    @Transactional public Appointment closeAppointment(Long userId, Long appointmentId, String result, String reason) { return scheduling.closeAppointment(userId, appointmentId, result, reason); }
+    public List<AppointmentHistoryEntry> history(Long callerId, boolean admin, Long appointmentId) { return scheduling.history(callerId, admin, appointmentId); }
+    public List<UpcomingAppointment> upcoming(LocalDate from, LocalDate to, Long locationId) { return scheduling.upcoming(from, to, locationId); }
+    public List<InboxItem> inbox(Long locationId, Long professionalId, Long specialtyId, LocalDate date) { return scheduling.inbox(locationId, professionalId, specialtyId, date); }
 }

@@ -83,6 +83,21 @@ public final class Ports {
         List<SchedulingService.EpsPlan> epsPlans(Long epsId);
         SchedulingService.EpsPlan createEpsPlan(Long epsId, Long regimeId, String code, String name);
         SchedulingService.EpsPlan updateEpsPlan(Long id, String name, Boolean active);
+        List<SchedulingService.ProfessionalAppointment> professionalAppointments(Long userId, LocalDate from, LocalDate to, Long locationId);
+        SchedulingService.Appointment closeAppointment(Long userId, Long appointmentId, String result, String reason);
+        List<SchedulingService.AppointmentHistoryEntry> history(Long callerId, boolean admin, Long appointmentId);
+        List<SchedulingService.UpcomingAppointment> upcoming(LocalDate from, LocalDate to, Long locationId);
+        List<SchedulingService.InboxItem> inbox(Long locationId, Long professionalId, Long specialtyId, LocalDate date);
+    }
+
+    /** Internal, PII-free domain event published after a relevant appointment status transition commits. */
+    public record AppointmentStatusChanged(Long appointmentId, String previousStatus, String newStatus,
+                                           String source, Long actorUserId, LocalDateTime occurredAt) {}
+
+    /** Output port for n8n readiness. Inactive by default; S5/S6 will wire the real HTTP webhook adapter here
+     *  without touching the call sites in SchedulingJdbcAdapter. */
+    public interface AppointmentEvents {
+        void publish(AppointmentStatusChanged event);
     }
 
     public record IssuedRefresh(String value, String jti, Instant expiresAt) {}

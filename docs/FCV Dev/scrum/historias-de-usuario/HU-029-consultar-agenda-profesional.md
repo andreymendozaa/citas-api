@@ -2,7 +2,7 @@
 id: HU-029
 tipo: historia-de-usuario
 titulo: "Consultar agenda profesional"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-007-operacion-profesional-y-administrativa]]"
 esfuerzo: Medio
 sprint_sugerido: "Incremento 6"
@@ -45,10 +45,11 @@ Es distinta del calendario de bloques de disponibilidad.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS (backend) | `ProfessionalOperationsIntegrationTest.agendaListsOnlyOwnApprovedAppointmentsWithFilters` | `GET /api/v1/professional/appointments` solo devuelve citas propias `APPROVED`; excluye `REQUESTED` propia y citas de otro profesional. |
+| CA-02 | PASS (backend) | `ProfessionalOperationsIntegrationTest.agendaListsOnlyOwnApprovedAppointmentsWithFilters` | Filtros `from`/`to`/`locationId` verificados de forma independiente. |
+| CA-03 / DoD | PASS (backend) | mismo test | Aislamiento estructural: no existe parámetro de profesional en el endpoint, solo puede verse la propia agenda. Falta cliente (T-03). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-29 — Backend implementado y verificado (Maven 40/40 verde): `GET /api/v1/professional/appointments?from=&to=&locationId=`. Frontend pendiente para una ronda posterior.
 ## Notas y decisiones
 - Los campos visibles no amplían el PRD ni contienen historia clínica.
