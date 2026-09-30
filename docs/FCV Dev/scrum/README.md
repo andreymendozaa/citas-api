@@ -32,13 +32,15 @@ La evidencia de cada CA está en la tabla de cada HU.
 
 | Estado | Cantidad | HU |
 |---|---|---|
-| `Completada` | 17 | HU-001, 002, 005, 006, 007, 008, 009, 010, 012, 013, 017, 022, 025, 029, 030, 031, 032 |
-| `En desarrollo` | 14 | HU-003, 004, 014, 015, 016, 018, 019, 020, 021, 023, 024, 026, 027, 028 |
+| `Completada` | 20 | HU-001, 002, 005, 006, 007, 008, 009, 010, 012, 013, 017, 022, 025, 026, 027, 028, 029, 030, 031, 032 |
+| `En desarrollo` | 11 | HU-003, 004, 014, 015, 016, 018, 019, 020, 021, 023, 024 |
 | `Aprobada` (sin iniciar) | 1 | HU-011 |
 | `En progreso` | 1 | HU-033 |
 | `Pendiente de aprobación` | 3 | HU-034, 035, 036 |
 
-Causas de que las 14 HU sigan `En desarrollo`:
+Actualización del mismo día: HU-026, HU-027 y HU-028 pasan a `Completada` con `AppointmentLifecycleIntegrationTest` (8 casos) y 4 pruebas de cliente. Las pruebas destaparon un bug: se respondía un error 500 ante una cita ajena o inexistente y ante una solicitud ya resuelta; se corrigió siguiendo Red → Green.
+
+Causas registradas en la auditoría inicial (HU-026 a HU-028 ya resueltas):
 - **Falta de pruebas dedicadas.** Las guardas existen en el código, pero no hay una prueba que las verifique:
   - HU-014: rechazo de duración ≠ 30/60.
   - HU-015: unicidad sin registro parcial.

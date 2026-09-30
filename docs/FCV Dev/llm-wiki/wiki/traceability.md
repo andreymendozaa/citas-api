@@ -54,4 +54,15 @@ Resultado:
 - WF-001 y WF-002 exportados en JSON: hoy solo existen especificaciones `.md` en `automations/n8n/`.
 - Evidencia de MCP, documento de riesgos residuales, Swagger, `current-state.md` y webhook real de n8n.
 
+**HECHO — actualización del mismo día · pruebas de cancelación y reprogramación.** Se añadió `AppointmentLifecycleIntegrationTest` (8 casos REST + BD sobre slots, ownership, roles, estados inválidos y auditoría) y 4 pruebas de cliente en `DashboardScreen.test.tsx`.
+
+Siguiendo Red → Green, 3 casos fallaron por `EmptyResultDataAccessException` sin manejar (error 500) en cita ajena/inexistente y en solicitud inexistente/ya resuelta. Se corrigió en `SchedulingJdbcAdapter` para responder `404`/`409`.
+
+También apareció contaminación de la base de pruebas persistente: dos suites existentes asumen ser las únicas con citas `REQUESTED`. La nueva prueba resuelve su propia solicitud y se limpiaron las filas huérfanas del esquema `_test`.
+
+Resultado:
+- Maven 48/48 en dos ejecuciones consecutivas.
+- HU-026, HU-027 y HU-028 pasan a `Completada`.
+- Estado global: 20 `Completada` y 11 `En desarrollo`.
+
 **PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.

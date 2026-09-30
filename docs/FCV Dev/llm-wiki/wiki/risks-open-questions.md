@@ -4,7 +4,9 @@
 - ~~No está definido el conjunto de estados y transiciones~~ — resuelto: catálogo sembrado en V2/V3 y transiciones centralizadas en `SchedulingJdbcAdapter`.
 - ~~Falta estrategia de exclusión concurrente de slots~~ — resuelto: asignación condicional transaccional, probada en `concurrentReservationsProduceExactlyOneAppointmentAndOneConflict`.
 - ~~Falta política de zona horaria~~ — resuelto: reloj de negocio `America/Bogota`.
-- (2026-09-30) Cancelación y reprogramación (HU-026 a 028) sin pruebas dedicadas: una regresión en la liberación o el intercambio de slots no sería detectada por la suite actual.
+- ~~(2026-09-30) Cancelación y reprogramación (HU-026 a 028) sin pruebas dedicadas~~ — resuelto el mismo día con `AppointmentLifecycleIntegrationTest`.
+- (2026-09-30) `SchedulingJdbcAdapter.decide` (decisión de cita especializada, HU-024) mantiene el patrón `queryForMap` que causaba errores 500. Es probable que una cita inexistente o que ya no está `REQUESTED` responda 500 en lugar de `404`/`409`; debe confirmarse con la prueba pendiente de HU-024 CA-03.
+- (2026-09-30) La base de pruebas Maven es persistente y algunas suites asumen ser las únicas con citas `REQUESTED` (`pending()` con un solo elemento, `$[0]`). Cualquier prueba que deje una solicitud sin resolver rompe a las demás. Conviene hacer esas aserciones independientes de datos ajenos.
 - (2026-09-30) Brechas funcionales abiertas:
   - afiliación posterior al registro (HU-011);
   - catálogo de estados de reprogramación (HU-003);
