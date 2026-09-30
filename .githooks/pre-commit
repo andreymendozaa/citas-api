@@ -3,7 +3,7 @@ set -eu
 
 git diff --cached --name-only --diff-filter=ACM | while IFS= read -r file; do
   case "$file" in .env.example|.githooks/pre-commit) continue ;; esac
-  if git show ":$file" | grep -Eiq '(JWT_(ACCESS|REFRESH)_SECRET|DB_PASSWORD|MYSQL_ROOT_PASSWORD|OAUTH_CLIENT_SECRET)[[:space:]]*[:=][[:space:]]*[^[:space:]$]+'; then
+  if git show ":$file" | grep -Eiq '(JWT_(ACCESS|REFRESH)_SECRET|DB_PASSWORD|MYSQL_ROOT_PASSWORD|OAUTH_CLIENT_SECRET)[[:space:]]*[:=][[:space:]]*[^[:space:]$}]+'; then
     printf '%s\n' "Se detectó un secreto potencial en $file. Retíralo antes de confirmar."
     exit 1
   fi
