@@ -45,7 +45,7 @@ class ApplicationConfig {
         return new PasswordResetService(accounts, resets, passwords, sessions, transactions, notifications, clock, Duration.ofMinutes(ttlMinutes));
     }
 
-    @Bean ProfileService profileService(Ports.Accounts accounts, Ports.Transactions transactions) {
-        return new ProfileService(accounts, transactions);
+    @Bean ProfileService profileService(Ports.Accounts accounts, Ports.Transactions transactions, Ports.Affiliations affiliations) {
+        return new ProfileService(accounts, transactions, affiliations);
     }
 }

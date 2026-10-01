@@ -60,6 +60,32 @@ El CORS permite exclusivamente `FRONTEND_ORIGIN`, métodos `POST`, `GET`, `PUT`,
 
 `GET /api/v1/appointments/mine?status=&date=` es exclusivo de `USER` y obtiene el usuario desde el JWT; no acepta ni expone un identificador de paciente. `status` y `date` (`YYYY-MM-DD`) son opcionales. Cada elemento devuelve `id`, `professionalName`, `specialtyName`, `locationName`, `startAt`, `endAt`, `durationMinutes`, `status` y `rejectionReason` cuando la cita fue rechazada. La consulta se construye sobre las FKs existentes de `appointments`, catálogos y `appointment_status_history`, por lo que no requiere migración ni altera reservas, slots o estados.
 
+## DECISIÓN — 2026-09-30 · Afiliación del USER (HU-011, RF-04) y regímenes (V5)
+
+Por decisión del usuario, HU-011 cubre también consultar y cambiar la afiliación propia, alineando su alcance con sus CA y con el RF-04.
+
+**Endpoints (solo rol `USER`; el usuario se toma del JWT, sin parámetro de usuario):**
+- `GET /api/v1/users/me/affiliation`: responde `200` con `planId`, `planCode`, `planName`, `epsId`, `epsName`, `regimeId`, `regimeName` y `membershipNumber`, o `204` si no hay afiliación.
+- `PUT /api/v1/users/me/affiliation` con `{"planId": n}`:
+  - fija el plan vigente;
+  - el mismo plan vigente → `409`;
+  - plan inactivo, de EPS inactiva, inexistente o ausente → `400`;
+  - ADMIN/PROFESSIONAL → `403`.
+
+**Reglas de no duplicación (CA-02):**
+- Nunca hay dos filas del mismo plan para un usuario, ni más de una vigente.
+- Volver a un plan anterior reactiva su fila.
+- El número de afiliado sigue siendo sintético (`AUTO-<usuario>-<plan>`), como en el registro.
+
+**Cambio de comportamiento:** `GET /api/v1/catalogs/plans` (usado por el registro) y la validación del registro solo aceptan planes activos de una EPS activa. Antes listaban los planes activos aunque su EPS estuviera desactivada.
+
+**Migración V5:** siembra en el catálogo fijo `insurance_regimes` los 5 valores del modelo de referencia del trainer (CONTRIBUTIVO, SUBSIDIADO, ESPECIAL, EXCEPCION, PARTICULAR), aprobados por el usuario. Es idempotente por `code`, no cambia el esquema y no toca V1–V4. La 3FN se mantiene: la afiliación solo guarda FKs.
+
+**Evidencia:**
+- `AffiliationIntegrationTest` (5 casos);
+- `s4Screens.test.tsx` (2 casos) y `schedulingApi.test.ts`;
+- validación en vivo en Chrome.
+
 ## DECISIÓN — 2026-09-30 · Cambios aditivos de contrato (HU-003, HU-016, HU-021)
 
 Los dos cambios del backend son aditivos y compatibles: ningún consumidor existente se rompe.

@@ -63,7 +63,7 @@ class AuthIntegrationTest extends DatabaseIntegrationSupport {
                 .andExpect(status().isCreated());
     }
     @Test void registrationCreatesOptionalCurrentInsuranceAffiliation() throws Exception {
-        Long planId = jdbc.queryForObject("select id from eps_plans where active=true limit 1", Long.class);
+        Long planId = jdbc.queryForObject("select p.id from eps_plans p join eps e on e.id=p.eps_id where p.active=true and e.active=true limit 1", Long.class);
         String email = uniqueEmail();
         String body = mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON).content("""
                 {"firstName":"Ana","lastName":"Plan","documentType":"CC","documentNumber":"%s","email":"%s","phone":"3000000000","password":"SyntheticPass123!","insurancePlanId":%d}

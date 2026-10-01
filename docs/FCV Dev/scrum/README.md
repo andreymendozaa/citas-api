@@ -32,9 +32,8 @@ La evidencia de cada CA está en la tabla de cada HU.
 
 | Estado | Cantidad | HU |
 |---|---|---|
-| `Completada` | 30 | HU-001 a HU-003, HU-005 a HU-010, HU-012 a HU-032 |
+| `Completada` | 31 | HU-001 a HU-003, HU-005 a HU-032 |
 | `En desarrollo` | 1 | HU-004 (OpenAPI, previsto en S5) |
-| `Aprobada` (sin iniciar) | 1 | HU-011 |
 | `En progreso` | 1 | HU-033 |
 | `Pendiente de aprobación` | 3 | HU-034, 035, 036 |
 
@@ -54,6 +53,8 @@ Cuarta actualización del mismo día, sobre las funcionales pequeñas:
 - HU-021: filtro "Tipo de cita" en la reserva.
 
 Las tres pasan a `Completada`. Solo queda HU-004, que depende de OpenAPI (S5).
+
+Quinta actualización del mismo día: HU-011 pasa de `Aprobada` a `Completada`. Por decisión del usuario se amplió su alcance a consultar y cambiar la afiliación propia, y se sembraron los 5 regímenes del modelo de referencia (V5). Con esto, **todos los RF funcionales del PRD (RF-01 a RF-19) quedan implementados y probados**. Pendientes: HU-004/RF-20 (OpenAPI), HU-033 (en progreso) y HU-034 a 036 (n8n, S5/S6).
 
 Causas registradas en la auditoría inicial (todas resueltas salvo HU-004):
 - **Falta de pruebas dedicadas.** Las guardas existen en el código, pero no hay una prueba que las verifique:

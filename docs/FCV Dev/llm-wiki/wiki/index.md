@@ -12,10 +12,9 @@ Implementado y verificado:
 S4 queda cerrado. Pantallas de S4 sin aprobación visual Stitch: ver [Riesgos](risks-open-questions.md).
 
 Auditoría del 2026-09-30:
-- Estado global: 30 HU `Completada`.
+- Estado global: 31 HU `Completada`. Todos los RF funcionales del PRD (RF-01 a RF-19) están implementados y probados.
 - Pendientes:
   - HU-004: OpenAPI, previsto en S5.
-  - HU-011: afiliación posterior al registro.
   - HU-033: integración web, en progreso.
   - HU-034 a 036: automatizaciones n8n.
 - Las nuevas pruebas corrigieron 4 errores 500 y la edición y eliminación de bloques pasados.

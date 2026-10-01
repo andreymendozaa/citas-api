@@ -32,7 +32,7 @@ class SchedulingJdbcAdapter implements Ports.Scheduling {
             case "reschedule-statuses" -> "select id,code,name,is_terminal as terminal from reschedule_request_statuses order by id";
             case "roles" -> "select id,code,name,description from roles order by id";
             case "regimes" -> "select id,code,name from insurance_regimes order by name";
-            case "plans" -> "select p.id,p.code,p.name,p.eps_id as epsId,p.regime_id as regimeId from eps_plans p where p.active=true order by p.name";
+            case "plans" -> "select p.id,p.code,p.name,p.eps_id as epsId,p.regime_id as regimeId from eps_plans p join eps e on e.id=p.eps_id where p.active=true and e.active=true order by p.name";
             default -> throw new IllegalArgumentException("Catálogo no soportado");
         }; return jdbc.queryForList(sql);
     }

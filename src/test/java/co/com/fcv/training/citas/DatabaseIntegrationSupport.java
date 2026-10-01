@@ -24,5 +24,9 @@ abstract class DatabaseIntegrationSupport {
             registry.add("spring.datasource.username", MYSQL::getUsername);
             registry.add("spring.datasource.password", MYSQL::getPassword);
         }
+        // Each test class with its own @DynamicPropertySource gets its own cached Spring context and Hikari pool.
+        // With ~16 suites the default pool of 10 exceeds MySQL's default max_connections (151): keep test pools small.
+        registry.add("spring.datasource.hikari.maximum-pool-size", () -> 3);
+        registry.add("spring.datasource.hikari.minimum-idle", () -> 1);
     }
 }

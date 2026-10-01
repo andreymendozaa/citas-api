@@ -38,7 +38,15 @@ public final class Ports {
         boolean matches(String raw, String hash);
     }
 
-    public interface Affiliations { void createCurrent(Long userId, Long planId); }
+    /** Insurance affiliation of a USER (HU-011): at most one current plan, never two rows for the same plan. */
+    public interface Affiliations {
+        void createCurrent(Long userId, Long planId);
+        Optional<Affiliation> current(Long userId);
+        Affiliation changeCurrent(Long userId, Long planId);
+    }
+
+    public record Affiliation(Long planId, String planCode, String planName, Long epsId, String epsName,
+                              Long regimeId, String regimeName, String membershipNumber) {}
 
     /** Persistence for password recovery tokens (HU-008/HU-009). */
     public interface PasswordResets {

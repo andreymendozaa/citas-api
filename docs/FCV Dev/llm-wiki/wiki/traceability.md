@@ -100,4 +100,16 @@ En las brechas del PRD quedan resueltos RF-05, RF-07 (UI) y RF-10. Siguen abiert
 - RF-06 (UI): edición de nombre y duración de especialidades.
 - RF-20: OpenAPI.
 
+**HECHO — quinta actualización · HU-011 y cierre de requerimientos funcionales.** HU-011 pasa a `Completada`:
+- consulta y cambio de la afiliación propia, sin duplicar planes;
+- 5 regímenes sembrados con la V5;
+- `AffiliationIntegrationTest` (5 casos) y 3 pruebas de cliente;
+- validación en vivo en Chrome.
+
+Con esto, todos los RF funcionales del PRD (RF-01 a RF-19) quedan implementados y probados. RF-20 sigue parcial hasta publicar OpenAPI (HU-004, S5).
+
+Estado global: 31 `Completada`, 1 `En desarrollo` (HU-004), 1 `En progreso` (HU-033) y 3 `Pendiente de aprobación` (HU-034 a 036, n8n).
+
+**HECHO — entorno.** En Docker sobre Windows, el vigilante de archivos de Vite no detecta cambios hechos desde el host. Tras editar `citas-web` hay que reiniciar `npm run dev`, o lanzarlo con sondeo, para verlos en `localhost:5173`.
+
 **PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.
