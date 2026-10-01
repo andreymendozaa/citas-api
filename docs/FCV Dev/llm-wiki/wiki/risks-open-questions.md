@@ -9,11 +9,12 @@
 - (2026-09-30) La base de pruebas Maven es persistente y algunas suites asumen ser las únicas con citas `REQUESTED` (`pending()` con un solo elemento, `$[0]`). Cualquier prueba que deje una solicitud sin resolver rompe a las demás. Conviene hacer esas aserciones independientes de datos ajenos.
 - (2026-09-30) Brechas funcionales abiertas:
   - afiliación posterior al registro (HU-011);
-  - catálogo de estados de reprogramación (HU-003);
-  - filtro por tipo de cita (HU-021);
-  - edición de especialidades y reasignación de profesionales en la UI (HU-014/016);
+  - edición de nombre y duración de especialidades en la UI;
   - OpenAPI (HU-004);
   - Actuator.
+
+  Resueltas el mismo día: catálogo de estados de reprogramación (HU-003), filtro por tipo de cita (HU-021) y reasignación de profesionales con primaria (HU-016).
+- (2026-09-30) El catálogo de regímenes solo contiene `PARTICULAR`. El PRD no fija valores, pero la afiliación EPS normalmente distingue contributivo y subsidiado; conviene confirmarlo antes de HU-011.
 - (2026-09-30) `main` no se ha actualizado desde S2 en ninguno de los tres repositorios; el merge `develop → main` es entregable de S4/S6.
 - (2026-09-30) Repositorio raíz `citas` publicado pese a la restricción de dos repos públicos y a "No inicializar Git en la raíz" (`AGENTS.md`). Pendiente de decisión del usuario.
 - Es ambiguo si reservas `REQUESTED` o reprogramaciones `PENDING` bloquean la edición de bloques.

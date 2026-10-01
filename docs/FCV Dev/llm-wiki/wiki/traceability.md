@@ -86,4 +86,18 @@ Resultado:
 - Estado global: 27 `Completada` y 4 `En desarrollo`: HU-003 y HU-021 por funcionalidad, HU-016 por UI, HU-004 por OpenAPI.
 - Ninguna HU queda pendiente solo por falta de pruebas.
 
+**HECHO — cuarta actualización · funcionales pequeñas.** Se cerraron tres HU:
+- HU-003: endpoint de estados de reprogramación y `FixedCatalogsIntegrationTest` (3 casos).
+- HU-016: `primarySpecialtyId` en el listado ADMIN, selector explícito de primaria y editor de asignaciones; la lista ahora muestra nombres en lugar de ids.
+- HU-021: filtro por tipo de cita en la reserva.
+
+Todas las pruebas nuevas pasaron en la primera ejecución.
+
+Estado global: 30 `Completada`, 1 `En desarrollo` (HU-004, OpenAPI/S5), 1 `Aprobada` (HU-011, afiliación posterior al registro), 1 `En progreso` (HU-033) y 3 `Pendiente de aprobación` (HU-034 a 036, n8n).
+
+En las brechas del PRD quedan resueltos RF-05, RF-07 (UI) y RF-10. Siguen abiertos:
+- RF-04: afiliación, HU-011.
+- RF-06 (UI): edición de nombre y duración de especialidades.
+- RF-20: OpenAPI.
+
 **PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.

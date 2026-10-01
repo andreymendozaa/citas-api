@@ -13,7 +13,7 @@ import java.util.Map;
 @Service
 public class SchedulingService {
     public record Specialty(Long id, String code, String name, int durationMinutes, boolean general, boolean active) {}
-    public record Professional(Long id, String name, String professionalCode, String licenseNumber, boolean active, List<Long> specialtyIds, List<Long> locationIds) {}
+    public record Professional(Long id, String name, String professionalCode, String licenseNumber, boolean active, List<Long> specialtyIds, List<Long> locationIds, Long primarySpecialtyId) {}
     public record Block(Long id, Long locationId, LocalDate date, LocalTime start, LocalTime end) {}
     public record Available(Long professionalId, String professionalName, LocalDateTime startAt, LocalDateTime endAt) {}
     public record Appointment(Long id, String status, LocalDateTime startAt, LocalDateTime endAt) {}

@@ -60,6 +60,17 @@ El CORS permite exclusivamente `FRONTEND_ORIGIN`, métodos `POST`, `GET`, `PUT`,
 
 `GET /api/v1/appointments/mine?status=&date=` es exclusivo de `USER` y obtiene el usuario desde el JWT; no acepta ni expone un identificador de paciente. `status` y `date` (`YYYY-MM-DD`) son opcionales. Cada elemento devuelve `id`, `professionalName`, `specialtyName`, `locationName`, `startAt`, `endAt`, `durationMinutes`, `status` y `rejectionReason` cuando la cita fue rechazada. La consulta se construye sobre las FKs existentes de `appointments`, catálogos y `appointment_status_history`, por lo que no requiere migración ni altera reservas, slots o estados.
 
+## DECISIÓN — 2026-09-30 · Cambios aditivos de contrato (HU-003, HU-016, HU-021)
+
+Los dos cambios del backend son aditivos y compatibles: ningún consumidor existente se rompe.
+- **HU-003:** `GET /api/v1/catalogs/reschedule-statuses` devuelve `id`, `code`, `name` y `terminal` del catálogo fijo `reschedule_request_statuses` (PENDING, APPROVED, REJECTED, CANCELLED). Los catálogos fijos siguen sin rutas de escritura.
+- **HU-016:** cada elemento de `GET /api/v1/admin/professionals` incluye `primarySpecialtyId` (`null` si no hay asignaciones), para que el cliente edite asignaciones sin perder la especialidad primaria.
+- **HU-021:** el filtro por tipo general/especializada del RF-10 se resuelve en el cliente sobre el campo `general` que `GET /specialties` ya exponía, sin cambio de contrato.
+
+Evidencia:
+- `FixedCatalogsIntegrationTest` y `OfferAndAgendaRulesIntegrationTest` (Maven);
+- `BookAppointmentModal.test.tsx` y `DashboardScreen.test.tsx` (Vitest).
+
 ## PRECISIÓN — 2026-09-30 · Bloques de disponibilidad pasados
 
 `PATCH` y `DELETE /api/v1/professional/availability-blocks/{id}` responden `409` ("El bloque ya no es futuro") cuando el día del bloque ya pasó. Esto aplica aunque el `PATCH` intente moverlo a una fecha futura. Un bloque ajeno responde `404` y un bloque con citas comprometidas, `409`. Verificado por `OfferAndAgendaRulesIntegrationTest`.

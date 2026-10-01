@@ -111,6 +111,9 @@ class OfferAndAgendaRulesIntegrationTest extends DatabaseIntegrationSupport {
 
         mvc.perform(assignSpecialties(List.of(thirty,sixty),thirty)).andExpect(status().isNoContent());
         assertThat(primaryOf(professional)).containsExactly(thirty);
+        // The admin listing exposes the primary so the client can edit assignments without losing it.
+        mvc.perform(get("/api/v1/admin/professionals").header("Authorization","Bearer "+adminToken))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[?(@.id=="+professional+")].primarySpecialtyId").value(org.hamcrest.Matchers.contains(thirty.intValue())));
 
         Long unrelated = scheduling.createSpecialty("RX"+suffix,"Ajena "+suffix,30,true).id();
         mvc.perform(assignSpecialties(List.of(thirty,sixty),unrelated)).andExpect(status().isBadRequest()); // primary must belong to the list

@@ -12,8 +12,13 @@ Implementado y verificado:
 S4 queda cerrado. Pantallas de S4 sin aprobación visual Stitch: ver [Riesgos](risks-open-questions.md).
 
 Auditoría del 2026-09-30:
-- Estado global: 27 HU `Completada` y 4 `En desarrollo` (HU-003, 004, 016, 021).
-- Ya no queda ninguna HU pendiente solo por pruebas. Las nuevas pruebas corrigieron 4 errores 500 y la edición y eliminación de bloques pasados.
+- Estado global: 30 HU `Completada`.
+- Pendientes:
+  - HU-004: OpenAPI, previsto en S5.
+  - HU-011: afiliación posterior al registro.
+  - HU-033: integración web, en progreso.
+  - HU-034 a 036: automatizaciones n8n.
+- Las nuevas pruebas corrigieron 4 errores 500 y la edición y eliminación de bloques pasados.
 - Brechas funcionales y entregables S5/S6 pendientes: ver [Trazabilidad](traceability.md).
 
 Siguiente hito: cerrar esas brechas y luego S5 (Swagger, `current-state.md`, webhook n8n real).

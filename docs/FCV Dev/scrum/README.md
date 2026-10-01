@@ -32,8 +32,8 @@ La evidencia de cada CA está en la tabla de cada HU.
 
 | Estado | Cantidad | HU |
 |---|---|---|
-| `Completada` | 27 | HU-001, 002, 005, 006, 007, 008, 009, 010, 012, 013, 014, 015, 017, 018, 019, 020, 022, 023, 024, 025, 026, 027, 028, 029, 030, 031, 032 |
-| `En desarrollo` | 4 | HU-003 (catálogo de estados de reprogramación), HU-004 (OpenAPI), HU-016 (selector de primaria en la UI), HU-021 (filtro por tipo de cita) |
+| `Completada` | 30 | HU-001 a HU-003, HU-005 a HU-010, HU-012 a HU-032 |
+| `En desarrollo` | 1 | HU-004 (OpenAPI, previsto en S5) |
 | `Aprobada` (sin iniciar) | 1 | HU-011 |
 | `En progreso` | 1 | HU-033 |
 | `Pendiente de aprobación` | 3 | HU-034, 035, 036 |
@@ -48,7 +48,14 @@ Tercera actualización del mismo día: `OfferAndAgendaRulesIntegrationTest` (7 c
 - Resultado: HU-014, 015, 018, 019 y 020 pasan a `Completada`. HU-016 sigue `En desarrollo` solo por la UI de la especialidad primaria.
 - Ninguna HU queda pendiente únicamente por falta de pruebas.
 
-Causas registradas en la auditoría inicial (todas las de "falta de pruebas" ya resueltas):
+Cuarta actualización del mismo día, sobre las funcionales pequeñas:
+- HU-003: endpoint `GET /catalogs/reschedule-statuses` y `FixedCatalogsIntegrationTest`.
+- HU-016: `primarySpecialtyId` en `GET /admin/professionals`, y selector de primaria y editor de asignaciones en la UI ADMIN.
+- HU-021: filtro "Tipo de cita" en la reserva.
+
+Las tres pasan a `Completada`. Solo queda HU-004, que depende de OpenAPI (S5).
+
+Causas registradas en la auditoría inicial (todas resueltas salvo HU-004):
 - **Falta de pruebas dedicadas.** Las guardas existen en el código, pero no hay una prueba que las verifique:
   - HU-014: rechazo de duración ≠ 30/60.
   - HU-015: unicidad sin registro parcial.
