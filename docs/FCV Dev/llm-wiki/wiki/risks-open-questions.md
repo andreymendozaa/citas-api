@@ -1,5 +1,10 @@
 # Riesgos y preguntas abiertas
 
+- (2026-10-04) **Mejoras futuras, fuera del alcance de la entrega:**
+  - calendario mensual de disponibilidad para USER ("opción A", `PLAN_TRABAJO_CALENDARIO_USER.md`);
+  - edición de nombre y duración de especialidades en la UI;
+  - un endpoint de agregado diario por estado para WF-003 (brecha B4).
+
 - (2026-10-04) **Riesgos residuales S5/S6 (n8n, MCP, contenido no confiable):** R1–R8 en `evidence/S5-MCP-contenido-no-confiable-y-riesgos.md`. Los principales: cuenta n8n compartida (el token MCP actúa sobre toda la cuenta), prompt injection vía contenido de terceros, scopes amplios de Gmail OAuth y túnel público temporal. OpenAPI (HU-004) quedó resuelto el 2026-10-04.
 
 - ~~`citas-web` contiene cambios locales aún no versionados~~ — resuelto: todo está versionado y empujado a `develop` (2026-09-30).

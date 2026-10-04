@@ -48,6 +48,14 @@ El usuario autorizó publicar WF-002 y conectar la API real (`N8N_STATUS_WEBHOOK
 
 n8n corre en la nube y no alcanza `localhost:8080`. Se usa un túnel temporal (Cloudflare quick tunnel) que el usuario abre en su propia terminal, solo durante las pruebas controladas. Su URL efímera se configura únicamente en los nodos `Config` dentro de n8n y nunca se versiona. WF-002 no lo necesita: la API llama a n8n.
 
+## DECISIÓN — 2026-10-04 · Repositorio raíz `citas` público
+
+El usuario decide mantener publicado el repositorio raíz `citas` como repositorio de orquestación (planes, guías, `current-state.md`, prompts). Es una excepción consciente a "solo dos repos públicos" (`RESTRICCIONES_TECNICAS.md`) y a "no inicializar Git en la raíz" (`AGENTS.md`). Los entregables evaluables siguen siendo `citas-api` y `citas-web`. El repo raíz no contiene secretos (`.env` está ignorado).
+
+## DECISIÓN — 2026-10-04 · Calendario USER ("opción A") fuera de alcance
+
+El calendario mensual de disponibilidad para el USER (`PLAN_TRABAJO_CALENDARIO_USER.md`: `GET /availability/days`, `AvailabilityCalendar.tsx`, modal en tres pasos) queda **fuera del alcance de la entrega** y se registra como mejora futura. Ningún CA aprobado lo exige: la reserva por fecha actual cumple RF/HU-020/HU-021. Implementarlo requeriría un cambio cross-repo planificado según `AGENTS.md`.
+
 ## DECISIÓN — 2026-10-04 · MCP de n8n con privilegio mínimo
 
 El cliente (Claude Code) se conecta al MCP de la instancia con OAuth (registro local `andrey-n8n`). Los workflows del proyecto se mantienen con `availableInMCP=false` y no se cambia la configuración global del MCP de la instancia compartida. Evidencia y riesgos: `evidence/S5-MCP-contenido-no-confiable-y-riesgos.md`.
