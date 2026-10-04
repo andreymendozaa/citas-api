@@ -44,6 +44,10 @@ En la instancia del trainer, `$getWorkflowStaticData` no persistió entre ejecuc
 
 El usuario autorizó publicar WF-002 y conectar la API real (`N8N_STATUS_WEBHOOK_URL` en el `.env` raíz).
 
-## PREGUNTA ABIERTA — 2026-10-04 · Exposición de la API a n8n
+## DECISIÓN — 2026-10-04 · Exposición de la API a n8n (antes pregunta abierta)
 
-n8n corre en la nube y no alcanza `localhost:8080`. La opción propuesta es un túnel temporal (Cloudflare quick tunnel) abierto solo durante las pruebas controladas. Requiere autorización explícita del usuario en la configuración de permisos, porque expone la API local a Internet (protegida por JWT).
+n8n corre en la nube y no alcanza `localhost:8080`. Se usa un túnel temporal (Cloudflare quick tunnel) que el usuario abre en su propia terminal, solo durante las pruebas controladas. Su URL efímera se configura únicamente en los nodos `Config` dentro de n8n y nunca se versiona. WF-002 no lo necesita: la API llama a n8n.
+
+## DECISIÓN — 2026-10-04 · MCP de n8n con privilegio mínimo
+
+El cliente (Claude Code) se conecta al MCP de la instancia con OAuth (registro local `andrey-n8n`). Los workflows del proyecto se mantienen con `availableInMCP=false` y no se cambia la configuración global del MCP de la instancia compartida. Evidencia y riesgos: `evidence/S5-MCP-contenido-no-confiable-y-riesgos.md`.

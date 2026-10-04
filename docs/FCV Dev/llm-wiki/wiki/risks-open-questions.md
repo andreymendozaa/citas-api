@@ -1,5 +1,7 @@
 # Riesgos y preguntas abiertas
 
+- (2026-10-04) **Riesgos residuales S5/S6 (n8n, MCP, contenido no confiable):** R1–R8 en `evidence/S5-MCP-contenido-no-confiable-y-riesgos.md`. Los principales: cuenta n8n compartida (el token MCP actúa sobre toda la cuenta), prompt injection vía contenido de terceros, scopes amplios de Gmail OAuth y túnel público temporal. OpenAPI (HU-004) quedó resuelto el 2026-10-04.
+
 - ~~`citas-web` contiene cambios locales aún no versionados~~ — resuelto: todo está versionado y empujado a `develop` (2026-09-30).
 - ~~No está definido el conjunto de estados y transiciones~~ — resuelto: catálogo sembrado en V2/V3 y transiciones centralizadas en `SchedulingJdbcAdapter`.
 - ~~Falta estrategia de exclusión concurrente de slots~~ — resuelto: asignación condicional transaccional, probada en `concurrentReservationsProduceExactlyOneAppointmentAndOneConflict`.

@@ -29,7 +29,9 @@ Actualización del 2026-10-04 (S6): WF-002 publicado y validado de extremo a ext
 
 Actualización del 2026-10-04: WF-001 validado y HU-034 `Completada`; WF-003 ejecutado, con HU-036 `En desarrollo` por CA-01 parcial (global 34).
 
-Siguiente hito: evidencia MCP y riesgos residuales de S5, cierre de HU-033 y HU-036, LOOP_03 y merge a `main`.
+S5 cerrado el 2026-10-04: MCP n8n conectado e invocado desde el agente; análisis de contenido no confiable y riesgos residuales en `evidence/S5-MCP-contenido-no-confiable-y-riesgos.md` (ver [Riesgos](risks-open-questions.md)).
+
+Siguiente hito: cierre de HU-033 y HU-036, LOOP_03 y merge a `main`.
 
 ## Lectura recomendada
 
