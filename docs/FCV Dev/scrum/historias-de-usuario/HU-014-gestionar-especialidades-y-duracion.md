@@ -2,7 +2,7 @@
 id: HU-014
 tipo: historia-de-usuario
 titulo: "Gestionar especialidades y duración"
-estado: Pendiente de aprobación
+estado: Completada
 epica: "[[EP-003-administracion-de-catalogos-y-profesionales]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 3"
@@ -29,10 +29,10 @@ El profesional no puede sobrescribir la duración de una especialidad.
 ## Esfuerzo
 **Nivel:** Alto. **Justificación de dificultad:** su configuración determina el algoritmo de disponibilidad y reserva.
 ## Tareas de desarrollo
-- [ ] **T-01 — Definir catálogo/contrato.** Dificultad: Medio. Limitar duración a valores autorizados.
-- [ ] **T-02 — Aplicar validación y baja lógica.** Dificultad: Alto. Evitar duración inválida o eliminación referenciada.
-- [ ] **T-03 — Conectar a consulta/reserva.** Dificultad: Alto. Exponer duración como fuente única de slots.
-- [ ] **T-04 — Probar reglas.** Dificultad: Alto. Cubrir 30, 60, activa/inactiva y rol ADMIN.
+- [x] **T-01 — Definir catálogo/contrato.** Dificultad: Medio. Limitar duración a valores autorizados.
+- [x] **T-02 — Aplicar validación y baja lógica.** Dificultad: Alto. Evitar duración inválida o eliminación referenciada.
+- [x] **T-03 — Conectar a consulta/reserva.** Dificultad: Alto. Exponer duración como fuente única de slots.
+- [x] **T-04 — Probar reglas.** Dificultad: Alto. Cubrir 30, 60, activa/inactiva y rol ADMIN.
 ## Criterios de aceptación
 ### CA-01 — Duración restringida
 **Dado** un ADMIN, **cuando** configura una especialidad, **entonces** solo puede establecer 30 o 60 minutos.
@@ -41,16 +41,18 @@ El profesional no puede sobrescribir la duración de una especialidad.
 ### CA-03 — Vigencia protegida
 **Dado** una especialidad referenciada, **cuando** ADMIN intenta retirarla, **entonces** no se borra físicamente y la inactividad impide nuevas reservas.
 ## Definition of Done
-- [ ] CA-01 a CA-03 tienen pruebas de dominio/REST y cliente ADMIN aplicable.
-- [ ] Persistencia 3FN/migración aplicable y efecto sobre slots verificables.
-- [ ] Trazabilidad Scrum actualizada.
+- [x] CA-01 a CA-03 tienen pruebas de dominio/REST y cliente ADMIN aplicable.
+- [x] Persistencia 3FN/migración aplicable y efecto sobre slots verificables.
+- [x] Trazabilidad Scrum actualizada.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `OfferAndAgendaRulesIntegrationTest.specialtyDurationOnlyAccepts30Or60Minutes`; la UI ADMIN solo ofrece 30/60 | Alta con 0, 15, 45 o 90 → `400` sin crear la especialidad; `PATCH` con 45 → `400` sin cambios; `PATCH` con 60 → `200`. |
+| CA-02 | PASS | `SchedulingServiceIntegrationTest.retainsConsecutiveSlotsAndReleasesThemAfterAdministrativeRejection`; `AuthIntegrationTest.s3AppointmentRoutesKeepGeneralAndSpecializedContracts` | La duración proviene del catálogo (60 min → 2 slots). |
+| CA-03 / DoD | PASS | `SchedulingServiceIntegrationTest.rejectsPastOverlappingAndUnavailableSchedulingConfiguration`; no existe ruta `DELETE` | Especialidad inactiva impide la disponibilidad; baja solo lógica. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
+- 2026-09-30 — CA-01 cubierto con `OfferAndAgendaRulesIntegrationTest.specialtyDurationOnlyAccepts30Or60Minutes` (pasó directamente). Maven 58/58. Estado `En desarrollo` → `Completada`. Queda como mejora de UI, fuera de los CA, la edición de nombre y duración.
 ## Notas y decisiones
 - Medicina General debe estar representada por el catálogo aprobado.

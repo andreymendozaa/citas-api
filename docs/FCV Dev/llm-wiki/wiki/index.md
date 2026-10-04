@@ -1,6 +1,41 @@
 # Índice de la LLM Wiki
 
-Última actualización: 2026-09-22. El corte backend de identidad (HU-005/006/007) tiene implementación y contrato REST inicial. El frontend React/Vite está importado y contiene trabajo local de integración auth pendiente de verificación. Las demás capacidades siguen sin contrato final.
+Última actualización: 2026-09-30.
+
+Implementado y verificado:
+- Identidad (HU-005/006/007).
+- Agendamiento S3 completo (HU-014 a HU-028).
+- S4 completo en backend (Maven 40/40) y frontend (Vitest 34/34 y validación en Chrome), cubriendo:
+  - Incremento 1: recuperación y restablecimiento HU-008/009, perfil HU-010, EPS y planes HU-012/013.
+  - Incremento 3: agenda profesional HU-029, cierre HU-030, bandeja unificada HU-031, auditoría HU-032, preparación n8n.
+
+S4 queda cerrado. Pantallas de S4 sin aprobación visual Stitch: ver [Riesgos](risks-open-questions.md).
+
+Auditoría del 2026-09-30:
+- Estado global: 31 HU `Completada`. Todos los RF funcionales del PRD (RF-01 a RF-19) están implementados y probados.
+- Pendientes:
+  - HU-004: OpenAPI, previsto en S5.
+  - HU-033: integración web, en progreso.
+  - HU-034 a 036: automatizaciones n8n.
+- Las nuevas pruebas corrigieron 4 errores 500 y la edición y eliminación de bloques pasados.
+- Brechas funcionales y entregables S5/S6 pendientes: ver [Trazabilidad](traceability.md).
+
+Actualización del 2026-10-04 (S5, backend):
+- HU-004/RF-20 `Completada`: OpenAPI publicado en `/v3/api-docs` y copia en `docs/openapi/openapi-v1.json`. `GET /actuator/health` público.
+- Webhook real WF-002 listo en la API, incluidos los eventos de reprogramación: ver [Contratos](contracts.md).
+- Estado global: 32 HU `Completada`.
+
+Actualización del 2026-10-04 (S6): WF-002 publicado y validado de extremo a extremo; HU-035 `Completada` (global 33). Ver [Trazabilidad](traceability.md).
+
+Actualización del 2026-10-04: WF-001 validado y HU-034 `Completada`; WF-003 ejecutado, con HU-036 `En desarrollo` por CA-01 parcial (global 34).
+
+S5 cerrado el 2026-10-04: MCP n8n conectado e invocado desde el agente; análisis de contenido no confiable y riesgos residuales en `evidence/S5-MCP-contenido-no-confiable-y-riesgos.md` (ver [Riesgos](risks-open-questions.md)).
+
+Actualización del 2026-10-04: LOOP_03 ejecutado; HU-033 `Completada` (deuda visual Stitch aceptada). Global 35 de 36.
+
+HU-036 cerrada con un día simulado: **36 de 36 HU `Completada`**.
+
+Siguiente hito: merge `develop → main` en los tres repos y sustentación.
 
 ## Lectura recomendada
 

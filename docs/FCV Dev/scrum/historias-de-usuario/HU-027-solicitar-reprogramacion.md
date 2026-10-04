@@ -2,7 +2,7 @@
 id: HU-027
 tipo: historia-de-usuario
 titulo: "Solicitar reprogramación"
-estado: Pendiente de aprobación
+estado: Completada
 epica: "[[EP-006-ciclo-de-vida-de-citas-y-reprogramaciones]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 5"
@@ -29,9 +29,9 @@ Conserva profesional/especialidad; cambiar profesional es una nueva cita. La sol
 ## Esfuerzo
 **Nivel:** Alto. **Justificación de dificultad:** requiere doble reserva coordinada y conserva el estado original.
 ## Tareas de desarrollo
-- [ ] **T-01 — Validar cita/elegibilidad.** Dificultad: Alto. Exigir propia, futura y `APPROVED`.
-- [ ] **T-02 — Retener nueva franja.** Dificultad: Alto. Mantener profesional/especialidad y evitar doble reserva.
-- [ ] **T-03 — Persistir solicitud/pruebas.** Dificultad: Alto. Conservar original y auditar `PENDING`.
+- [x] **T-01 — Validar cita/elegibilidad.** Dificultad: Alto. Exigir propia, futura y `APPROVED`.
+- [x] **T-02 — Retener nueva franja.** Dificultad: Alto. Mantener profesional/especialidad y evitar doble reserva.
+- [x] **T-03 — Persistir solicitud/pruebas.** Dificultad: Alto. Conservar original y auditar `PENDING`.
 ## Criterios de aceptación
 ### CA-01 — Solicitud válida
 **Dado** una cita propia futura `APPROVED`, **cuando** USER selecciona nueva franja disponible del mismo profesional/especialidad, **entonces** se crea reprogramación `PENDING` y se retiene esa franja.
@@ -40,16 +40,18 @@ Conserva profesional/especialidad; cambiar profesional es una nueva cita. La sol
 ### CA-03 — Restricciones
 **Dado** cita no elegible, cambio de profesional/especialidad o franja no disponible, **cuando** se solicita, **entonces** se rechaza sin alterar citas/reservas.
 ## Definition of Done
-- [ ] CA-01 a CA-03 probados con concurrencia/persistencia, ownership y auditoría.
-- [ ] Contrato/cliente y migración/índices aplicables verificables.
-- [ ] Trazabilidad Scrum actualizada.
+- [x] CA-01 a CA-03 probados con concurrencia/persistencia, ownership y auditoría.
+- [x] Contrato/cliente y migración/índices aplicables verificables.
+- [x] Trazabilidad Scrum actualizada.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `AppointmentLifecycleIntegrationTest.rescheduleRetainsTheNewRangeAndKeepsTheOriginalUntilDecision`; `DashboardScreen.test.tsx` (HU-027 solicita reprogramación con el mismo profesional) | Reprogramación `PENDING` que retiene la nueva franja (slots 10:00/10:30 asignados a la cita y fuera de la disponibilidad). |
+| CA-02 | PASS | mismo test | La cita conserva `APPROVED`, su horario original y sus slots hasta la decisión ADMIN. |
+| CA-03 / DoD | PASS | `AppointmentLifecycleIntegrationTest.rescheduleRejectsIneligibleRequestsWithoutSideEffects`; `DashboardScreen.test.tsx` (bloquea segunda reprogramación) | Cita ajena o inexistente → `404`; franja ocupada, sede no asignada, fecha pasada, cita no `APPROVED` o solicitud ya pendiente → `409`; ADMIN → `403`. Sin filas nuevas ni cambios de slots. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Pendiente de aprobación` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
+- 2026-09-30 — Pruebas dedicadas añadidas (`AppointmentLifecycleIntegrationTest`, 8 casos; 4 casos de cliente en `DashboardScreen.test.tsx`). Red → Green: la cita ajena o inexistente y la solicitud inexistente o ya resuelta provocaban `EmptyResultDataAccessException` sin manejar (error 500); `SchedulingJdbcAdapter.cancel/requestReschedule/decideReschedule` responden ahora `404`/`409`. Maven 48/48 (dos ejecuciones consecutivas) y Vitest verdes. Estado `En desarrollo` → `Completada`.
 ## Notas y decisiones
 - Se conserva el significado exacto de `PENDING` del catálogo fijo.

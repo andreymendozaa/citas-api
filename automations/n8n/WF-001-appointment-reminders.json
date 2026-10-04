@@ -1,0 +1,278 @@
+{
+  "name": "Andrey - WF-001 Recordatorios de citas",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "b1a0f001-0000-4000-8000-000000000001",
+      "name": "Cada hora",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cfg-base-url",
+              "name": "CITAS_API_BASE_URL",
+              "value": "<<CITAS_API_BASE_URL>>",
+              "type": "string"
+            },
+            {
+              "id": "cfg-recipient",
+              "name": "LAB_RECIPIENT_EMAIL",
+              "value": "<<LAB_RECIPIENT_EMAIL>>",
+              "type": "string"
+            },
+            {
+              "id": "cfg-window",
+              "name": "REMINDER_WINDOW_HOURS",
+              "value": 24,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1a0f001-0000-4000-8000-000000000002",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.CITAS_API_BASE_URL }}/actuator/health",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "b1a0f001-0000-4000-8000-000000000003",
+      "name": "Health API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.CITAS_API_BASE_URL }}/api/v1/auth/login",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "b1a0f001-0000-4000-8000-000000000004",
+      "name": "Login API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "httpCustomAuth": {
+          "name": "Andrey - citas-api login"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.CITAS_API_BASE_URL }}/api/v1/admin/appointments/upcoming",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "={{ $now.setZone('America/Bogota').toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.setZone('America/Bogota').plus({ hours: Number($('Config').first().json.REMINDER_WINDOW_HOURS) }).toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Login API').first().json.accessToken }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "b1a0f001-0000-4000-8000-000000000005",
+      "name": "Consultar citas proximas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 300],
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// WF-001: keep APPROVED appointments (the endpoint only returns APPROVED) whose start is inside the window and\n// drop personal fields. Reminders already sent are removed by the next node, keyed by appointment id + start time\n// (a rescheduled appointment gets a new key and a new reminder).\nconst cfg = $('Config').first().json;\nconst zone = 'America/Bogota';\nconst windowHours = Number(cfg.REMINDER_WINDOW_HOURS || 24);\nconst now = DateTime.now().setZone(zone);\nconst limit = now.plus({ hours: windowHours });\nlet read = 0, outside = 0;\nconst toSend = [];\nfor (const item of $input.all()) {\n  const a = item.json;\n  if (!a || a.id === undefined || !a.startAt) continue;\n  read++;\n  if (a.status && a.status !== 'APPROVED') { outside++; continue; }\n  const start = DateTime.fromISO(a.startAt, { zone });\n  const end = DateTime.fromISO(a.endAt, { zone });\n  if (!(start > now && start <= limit)) { outside++; continue; }\n  const key = a.id + '|' + a.startAt;\n  toSend.push({ json: {\n    key,\n    startAt: a.startAt,\n    appointmentId: a.id,\n    date: start.setLocale('es').toFormat(\"cccc d 'de' LLLL 'de' yyyy\"),\n    time: start.toFormat('HH:mm') + ' - ' + end.toFormat('HH:mm'),\n    location: a.locationName,\n    specialty: a.specialtyName,\n    professional: a.professionalName\n  } });\n}\n$execution.customData.set('read', String(read));\n$execution.customData.set('outsideWindow', String(outside));\n$execution.customData.set('inWindow', String(toSend.length));\n$execution.customData.set('sent', '0');\nreturn toSend;"
+      },
+      "id": "b1a0f001-0000-4000-8000-000000000006",
+      "name": "Filtrar ventana",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 200]
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "logic": "removeItemsWithAlreadySeenKeyValues",
+        "dedupeValue": "={{ $json.key }}",
+        "options": {
+          "scope": "node",
+          "historySize": 10000
+        }
+      },
+      "id": "b1a0f001-0000-4000-8000-00000000000c",
+      "name": "Descartar ya recordadas",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [1210, 60]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config').first().json.LAB_RECIPIENT_EMAIL }}",
+        "subject": "=Recordatorio de cita #{{ $json.appointmentId }}",
+        "emailType": "text",
+        "message": "=Recordatorio de cita #{{ $json.appointmentId }}\n\nFecha: {{ $json.date }}\nHora: {{ $json.time }} (hora de Bogota)\nSede: {{ $json.location }}\nEspecialidad: {{ $json.specialty }}\nProfesional: {{ $json.professional }}\n\nMensaje automatico de laboratorio (FCV Citas). No responder.",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "b1a0f001-0000-4000-8000-000000000007",
+      "name": "Enviar recordatorio (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1320, 200],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Andrey - Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gmail accepted these reminders. Keys were already recorded by 'Descartar ya recordadas'.\nconst sent = $input.all().length;\n$execution.customData.set('sent', String(sent));\nreturn [{ json: { result: 'sent', count: sent } }];"
+      },
+      "id": "b1a0f001-0000-4000-8000-000000000008",
+      "name": "Registrar enviados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 120]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gmail failed after retries: record how many, without message bodies.\nconst failed = $input.all().length;\n$execution.customData.set('failed', String(failed));\nreturn [{ json: { result: 'gmail_failed', count: failed } }];"
+      },
+      "id": "b1a0f001-0000-4000-8000-000000000009",
+      "name": "Registrar fallo Gmail",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// API unavailable (health, login or query failed after retries). Record only the error kind, never tokens or bodies.\nconst error = $input.first().json.error || {};\nconst kind = String(error.httpCode || error.status || error.code || error.name || 'unknown');\n$execution.customData.set('api', 'unavailable');\n$execution.customData.set('apiError', kind);\nreturn [{ json: { result: 'api_unavailable', error: kind } }];"
+      },
+      "id": "b1a0f001-0000-4000-8000-00000000000a",
+      "name": "API no disponible",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 480]
+    },
+    {
+      "parameters": {
+        "errorMessage": "=API de citas no disponible ({{ $json.error }}); no se enviaron recordatorios"
+      },
+      "id": "b1a0f001-0000-4000-8000-00000000000b",
+      "name": "Fallar ejecucion",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [1320, 480]
+    }
+  ],
+  "connections": {
+    "Cada hora": {
+      "main": [[{ "node": "Config", "type": "main", "index": 0 }]]
+    },
+    "Config": {
+      "main": [[{ "node": "Health API", "type": "main", "index": 0 }]]
+    },
+    "Health API": {
+      "main": [
+        [{ "node": "Login API", "type": "main", "index": 0 }],
+        [{ "node": "API no disponible", "type": "main", "index": 0 }]
+      ]
+    },
+    "Login API": {
+      "main": [
+        [{ "node": "Consultar citas proximas", "type": "main", "index": 0 }],
+        [{ "node": "API no disponible", "type": "main", "index": 0 }]
+      ]
+    },
+    "Consultar citas proximas": {
+      "main": [
+        [{ "node": "Filtrar ventana", "type": "main", "index": 0 }],
+        [{ "node": "API no disponible", "type": "main", "index": 0 }]
+      ]
+    },
+    "Filtrar ventana": {
+      "main": [[{ "node": "Descartar ya recordadas", "type": "main", "index": 0 }]]
+    },
+    "Descartar ya recordadas": {
+      "main": [[{ "node": "Enviar recordatorio (Gmail)", "type": "main", "index": 0 }]]
+    },
+    "Enviar recordatorio (Gmail)": {
+      "main": [
+        [{ "node": "Registrar enviados", "type": "main", "index": 0 }],
+        [{ "node": "Registrar fallo Gmail", "type": "main", "index": 0 }]
+      ]
+    },
+    "API no disponible": {
+      "main": [[{ "node": "Fallar ejecucion", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Bogota",
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "pinData": {},
+  "tags": []
+}

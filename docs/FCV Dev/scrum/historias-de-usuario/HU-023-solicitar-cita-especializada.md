@@ -2,7 +2,7 @@
 id: HU-023
 tipo: historia-de-usuario
 titulo: "Solicitar cita especializada"
-estado: Pendiente de aprobación
+estado: Completada
 epica: "[[EP-005-busqueda-y-reserva-de-citas]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 4"
@@ -29,9 +29,9 @@ La solicitud nace `REQUESTED` y retiene slots para evitar doble reserva.
 ## Esfuerzo
 **Nivel:** Alto. **Justificación de dificultad:** reserva provisional, concurrencia, estado y auditoría.
 ## Tareas de desarrollo
-- [ ] **T-01 — Definir solicitud especializada.** Dificultad: Medio. Documentar selección y respuesta `REQUESTED`.
-- [ ] **T-02 — Retener slots atómicamente.** Dificultad: Alto. Revalidar disponibilidad completa al confirmar.
-- [ ] **T-03 — Integrar flujo/pruebas.** Dificultad: Alto. Cubrir 30/60, ya tomada y auditoría.
+- [x] **T-01 — Definir solicitud especializada.** Dificultad: Medio. Documentar selección y respuesta `REQUESTED`.
+- [x] **T-02 — Retener slots atómicamente.** Dificultad: Alto. Revalidar disponibilidad completa al confirmar.
+- [x] **T-03 — Integrar flujo/pruebas.** Dificultad: Alto. Cubrir 30/60, ya tomada y auditoría.
 ## Criterios de aceptación
 ### CA-01 — Solicitud retenida
 **Dado** una especialidad/profesional/franja válidos, **cuando** USER confirma, **entonces** se crea cita `REQUESTED` y los slots quedan retenidos.
@@ -40,16 +40,18 @@ La solicitud nace `REQUESTED` y retiene slots para evitar doble reserva.
 ### CA-03 — Historial inicial
 **Dado** la solicitud creada, **cuando** se consulta auditoría, **entonces** se registra estado, fuente USER y fecha aplicables.
 ## Definition of Done
-- [ ] CA-01 a CA-03 probados incluida concurrencia/persistencia.
-- [ ] Contrato, cliente, migración/índices aplicables y seguridad de ownership verificados.
-- [ ] Trazabilidad Scrum actualizada.
+- [x] CA-01 a CA-03 probados incluida concurrencia/persistencia.
+- [x] Contrato, cliente, migración/índices aplicables y seguridad de ownership verificados.
+- [x] Trazabilidad Scrum actualizada.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PASS | `retainsConsecutiveSlotsAndReleasesThemAfterAdministrativeRejection` (`REQUESTED`, slots retenidos); `s3AppointmentRoutesKeepGeneralAndSpecializedContracts`; `BookAppointmentModal.test.tsx` |  |
+| CA-02 | PASS | mismo test (segunda reserva sobre la franja rechazada con "Franja"); protección transaccional probada en `concurrentReservationsProduceExactlyOneAppointmentAndOneConflict` |  |
+| CA-03 / DoD | PASS | `SpecializedDecisionIntegrationTest.specializedRequestRecordsInitialHistoryAsUser` | Registro inicial `REQUESTED`, fuente `USER` y actor = paciente, en BD y en `GET /appointments/{id}/history`. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-30 — Auditoría integral de CA/DoD contra código y pruebas (solicitada por el usuario): estado `Aprobada` → `En desarrollo`. Criterio de auditoría: PASS exige prueba automatizada o propiedad estructural; lo verificado solo por código o manualmente queda PARCIAL/PENDIENTE; la HU se completa solo sin CA pendientes.
+- 2026-09-30 — CA-03 cubierto con `SpecializedDecisionIntegrationTest.specializedRequestRecordsInitialHistoryAsUser` (pasó en la primera ejecución: el comportamiento ya era correcto). Maven 51/51 en dos ejecuciones consecutivas. Estado `En desarrollo` → `Completada`.
 ## Notas y decisiones
 - La reserva queda liberada al rechazo mediante [[HU-024-resolver-solicitud-especializada]].

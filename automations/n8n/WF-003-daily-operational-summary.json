@@ -1,0 +1,233 @@
+{
+  "name": "Andrey - WF-003 Resumen operativo diario",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "b3a0f003-0000-4000-8000-000000000001",
+      "name": "Diario 06:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cfg-base-url",
+              "name": "CITAS_API_BASE_URL",
+              "value": "<<CITAS_API_BASE_URL>>",
+              "type": "string"
+            },
+            {
+              "id": "cfg-recipient",
+              "name": "LAB_RECIPIENT_EMAIL",
+              "value": "<<LAB_RECIPIENT_EMAIL>>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b3a0f003-0000-4000-8000-000000000002",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.CITAS_API_BASE_URL }}/api/v1/auth/login",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "b3a0f003-0000-4000-8000-000000000003",
+      "name": "Login API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 300],
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpCustomAuth": {
+          "name": "Andrey - citas-api login"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.CITAS_API_BASE_URL }}/api/v1/admin/appointments/upcoming",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "from",
+              "value": "={{ $now.setZone('America/Bogota').toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $now.setZone('America/Bogota').toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Login API').first().json.accessToken }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "b3a0f003-0000-4000-8000-000000000004",
+      "name": "Citas del dia",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 300],
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.CITAS_API_BASE_URL }}/api/v1/admin/inbox",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Login API').first().json.accessToken }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "b3a0f003-0000-4000-8000-000000000005",
+      "name": "Bandeja ADMIN",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 300],
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// WF-003: aggregate only non-personal fields (sede, especialidad, tipo de pendiente). Names, phones and reasons are never read.\nconst zone = 'America/Bogota';\nconst today = DateTime.now().setZone(zone);\nconst incidents = [];\nconst esc = (s) => String(s).replace(/[&<>\"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[c]));\nconst failed = (items) => items.length === 1 && items[0].json && items[0].json.error;\nconst note = (items, label) => { const e = items[0].json.error || {}; incidents.push(`${label}: ${e.httpCode || e.status || e.code || e.name || 'error'}`); };\nconst login = $('Login API').all();\nif (failed(login) || !(login[0] && login[0].json.accessToken)) incidents.push('Login: sin token');\nconst apptItems = $('Citas del dia').all();\nconst inboxItems = $('Bandeja ADMIN').all();\nlet approved = [];\nif (failed(apptItems)) note(apptItems, 'Citas del día'); else approved = apptItems.map((i) => i.json).filter((a) => a && a.id !== undefined);\nlet pending = [];\nif (failed(inboxItems)) note(inboxItems, 'Bandeja ADMIN'); else pending = inboxItems.map((i) => i.json).filter((p) => p && p.type);\nconst countBy = (arr, key) => arr.reduce((m, x) => { const k = x[key] || 'Sin dato'; m[k] = (m[k] || 0) + 1; return m; }, {});\nconst byLocation = countBy(approved, 'locationName');\nconst bySpecialty = countBy(approved, 'specialtyName');\nconst pendingSpecialized = pending.filter((p) => p.type === 'SPECIALIZED').length;\nconst pendingReschedule = pending.filter((p) => p.type === 'RESCHEDULE').length;\nconst rows = (obj, empty) => Object.entries(obj).map(([k, v]) => `<tr><td>${esc(k)}</td><td style=\"text-align:right\">${v}</td></tr>`).join('') || `<tr><td colspan=\"2\">${empty}</td></tr>`;\nconst table = (title, head, body) => `<h3>${title}</h3><table border=\"1\" cellpadding=\"6\" cellspacing=\"0\"><tr><th>${head}</th><th>Citas</th></tr>${body}</table>`;\nconst dateLabel = today.setLocale('es').toFormat(\"cccc d 'de' LLLL 'de' yyyy\");\nconst html = [\n  `<h2>Resumen operativo FCV Citas — ${esc(dateLabel)}</h2>`,\n  `<p>Citas APPROVED programadas hoy: <b>${approved.length}</b></p>`,\n  table('Por sede', 'Sede', rows(byLocation, 'Sin citas aprobadas hoy')),\n  table('Por especialidad', 'Especialidad', rows(bySpecialty, 'Sin citas aprobadas hoy')),\n  `<h3>Pendientes de decisión ADMIN</h3><ul><li>Citas especializadas REQUESTED: ${pendingSpecialized}</li><li>Reprogramaciones PENDING: ${pendingReschedule}</li></ul>`,\n  '<h3>No disponible por contrato</h3><p>COMPLETED, NO_SHOW y CANCELLED del día: la API no expone un agregado diario por estado (brecha B4).</p>',\n  `<h3>Incidencias</h3>${incidents.length ? '<ul>' + incidents.map((i) => `<li>${esc(i)}</li>`).join('') + '</ul>' : '<p>Sin incidencias.</p>'}`,\n  '<p style=\"color:#666\">Mensaje automático de laboratorio (FCV Citas). No responder.</p>'\n].join('\\n');\n$execution.customData.set('approvedToday', String(approved.length));\n$execution.customData.set('pendingSpecialized', String(pendingSpecialized));\n$execution.customData.set('pendingReschedule', String(pendingReschedule));\n$execution.customData.set('incidents', String(incidents.length));\nreturn [{ json: {\n  subject: `Resumen operativo FCV Citas — ${today.toFormat('yyyy-MM-dd')}${incidents.length ? ' (con incidencias)' : ''}`,\n  html,\n  approvedToday: approved.length,\n  byLocation,\n  bySpecialty,\n  pendingSpecialized,\n  pendingReschedule,\n  incidents\n} }];"
+      },
+      "id": "b3a0f003-0000-4000-8000-000000000006",
+      "name": "Agregar resumen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config').first().json.LAB_RECIPIENT_EMAIL }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "b3a0f003-0000-4000-8000-000000000007",
+      "name": "Enviar resumen (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1320, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Andrey - Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "$execution.customData.set('result', 'sent');\nreturn [{ json: { result: 'sent' } }];"
+      },
+      "id": "b3a0f003-0000-4000-8000-000000000008",
+      "name": "Registrar enviado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 220]
+    },
+    {
+      "parameters": {
+        "errorMessage": "No se pudo enviar el resumen operativo por Gmail"
+      },
+      "id": "b3a0f003-0000-4000-8000-000000000009",
+      "name": "Fallar ejecucion",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [1540, 400]
+    }
+  ],
+  "connections": {
+    "Diario 06:00": {
+      "main": [[{ "node": "Config", "type": "main", "index": 0 }]]
+    },
+    "Config": {
+      "main": [[{ "node": "Login API", "type": "main", "index": 0 }]]
+    },
+    "Login API": {
+      "main": [[{ "node": "Citas del dia", "type": "main", "index": 0 }]]
+    },
+    "Citas del dia": {
+      "main": [[{ "node": "Bandeja ADMIN", "type": "main", "index": 0 }]]
+    },
+    "Bandeja ADMIN": {
+      "main": [[{ "node": "Agregar resumen", "type": "main", "index": 0 }]]
+    },
+    "Agregar resumen": {
+      "main": [[{ "node": "Enviar resumen (Gmail)", "type": "main", "index": 0 }]]
+    },
+    "Enviar resumen (Gmail)": {
+      "main": [
+        [{ "node": "Registrar enviado", "type": "main", "index": 0 }],
+        [{ "node": "Fallar ejecucion", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Bogota",
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "pinData": {},
+  "tags": []
+}

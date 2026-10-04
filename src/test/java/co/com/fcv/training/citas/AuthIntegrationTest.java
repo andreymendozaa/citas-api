@@ -1,6 +1,7 @@
 package co.com.fcv.training.citas;
 
 import co.com.fcv.training.citas.adapter.security.JwtTokens;
+import co.com.fcv.training.citas.application.SchedulingService;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,11 +21,9 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.UUID;
-import java.time.Instant;
+import java.util.Set;
+import java.time.*;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.concurrent.*;
@@ -34,17 +33,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
 @Import(AuthIntegrationTest.RoleProbe.class)
-class AuthIntegrationTest {
-    @Container static final MySQLContainer<?> MYSQL = new MySQLContainer<>("mysql:8.4");
+class AuthIntegrationTest extends DatabaseIntegrationSupport {
     private static final String ACCESS_KEY = UUID.randomUUID().toString() + UUID.randomUUID();
     private static final String REFRESH_KEY = UUID.randomUUID().toString() + UUID.randomUUID();
 
     @DynamicPropertySource static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
-        registry.add("spring.datasource.username", MYSQL::getUsername);
-        registry.add("spring.datasource.password", MYSQL::getPassword);
         registry.add("app.jwt.access-secret", () -> ACCESS_KEY);
         registry.add("app.jwt.refresh-secret", () -> REFRESH_KEY);
         registry.add("app.cookie.secure", () -> true);
@@ -55,6 +49,7 @@ class AuthIntegrationTest {
     @Autowired ObjectMapper mapper;
     @Autowired JdbcTemplate jdbc;
     @Autowired JwtTokens jwt;
+    @Autowired SchedulingService scheduling;
 
     private String uniqueEmail() { return "user-" + UUID.randomUUID() + "@example.test"; }
     private String uniqueDoc() { return UUID.randomUUID().toString(); }
@@ -66,6 +61,15 @@ class AuthIntegrationTest {
     private void register(String email, String doc) throws Exception {
         mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON).content(registration(email, doc)))
                 .andExpect(status().isCreated());
+    }
+    @Test void registrationCreatesOptionalCurrentInsuranceAffiliation() throws Exception {
+        Long planId = jdbc.queryForObject("select p.id from eps_plans p join eps e on e.id=p.eps_id where p.active=true and e.active=true limit 1", Long.class);
+        String email = uniqueEmail();
+        String body = mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON).content("""
+                {"firstName":"Ana","lastName":"Plan","documentType":"CC","documentNumber":"%s","email":"%s","phone":"3000000000","password":"SyntheticPass123!","insurancePlanId":%d}
+                """.formatted(uniqueDoc(), email, planId))).andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        Long userId = mapper.readTree(body).get("id").asLong();
+        assertThat(jdbc.queryForObject("select count(*) from user_insurance_affiliations where user_id=? and plan_id=? and is_current=true", Integer.class, userId, planId)).isEqualTo(1);
     }
     private org.springframework.test.web.servlet.ResultActions login(String email, String password) throws Exception {
         return mvc.perform(post("/api/v1/auth/login").header("X-Requested-With", "XMLHttpRequest")
@@ -165,6 +169,74 @@ class AuthIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"))
                 .andExpect(header().string("Access-Control-Allow-Credentials", "true"));
+    }
+
+    @Test void schedulingRoutesEnforceUserAdminAndProfessionalRoles() throws Exception {
+        String user = jwt.access(1L, Set.of("USER"));
+        mvc.perform(get("/api/v1/catalogs/locations").header("Authorization", "Bearer " + user)).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/admin/specialties").header("Authorization", "Bearer " + user)).andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/professional/availability-blocks").header("Authorization", "Bearer " + user)).andExpect(status().isForbidden());
+
+        String professionalEmail = uniqueEmail();
+        jdbc.update("insert into users(first_name,last_name,document_type,document_number,email,phone,password_hash,active,email_verified) values ('Rol','Profesional','CC',?,?,?,'hash',true,false)", uniqueDoc(), professionalEmail, "3000000000");
+        Long professionalUser = jdbc.queryForObject("select id from users where email=?", Long.class, professionalEmail);
+        jdbc.update("insert into professionals(user_id,professional_code,license_number,active) values (?,?,?,true)", professionalUser, "PC" + UUID.randomUUID(), "LIC" + UUID.randomUUID());
+        String professional = jwt.access(professionalUser, Set.of("PROFESSIONAL"));
+        mvc.perform(get("/api/v1/professional/availability-blocks").header("Authorization", "Bearer " + professional)).andExpect(status().isOk());
+
+        String admin = jwt.access(1L, Set.of("ADMIN"));
+        mvc.perform(get("/api/v1/admin/specialties").header("Authorization", "Bearer " + admin)).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/admin/professionals").header("Authorization", "Bearer " + admin)).andExpect(status().isOk());
+    }
+
+    @Test void s3AppointmentRoutesKeepGeneralAndSpecializedContracts() throws Exception {
+        String suffix = UUID.randomUUID().toString();
+        Long professional = scheduling.createProfessional("Ruta", "Profesional", "CC", "P" + suffix, "route-prof-" + suffix + "@example.test", "3000000000", "hash", "PC" + suffix, "LIC" + suffix);
+        Long owner = jdbc.queryForObject("select user_id from professionals where id=?", Long.class, professional);
+        Long general = scheduling.createSpecialty("GEN" + suffix, "General " + suffix, 30, true).id();
+        Long specialized = scheduling.createSpecialty("ESP" + suffix, "Especializada " + suffix, 60, false).id();
+        Long location = jdbc.queryForObject("select id from locations where active=true limit 1", Long.class);
+        scheduling.setProfessionalSpecialties(professional, java.util.List.of(general, specialized), general);
+        scheduling.setProfessionalLocations(professional, java.util.List.of(location));
+        LocalDate date = LocalDate.now().plusDays(7);
+        scheduling.createBlock(owner, location, date, LocalTime.of(8, 0), LocalTime.of(11, 0));
+
+        String patientEmail = uniqueEmail();
+        jdbc.update("insert into users(first_name,last_name,document_type,document_number,email,phone,password_hash,active,email_verified) values ('Ruta','Paciente','CC',?,?,?,'hash',true,false)", uniqueDoc(), patientEmail, "3000000000");
+        Long patient = jdbc.queryForObject("select id from users where email=?", Long.class, patientEmail);
+        String adminEmail = uniqueEmail();
+        jdbc.update("insert into users(first_name,last_name,document_type,document_number,email,phone,password_hash,active,email_verified) values ('Ruta','Admin','CC',?,?,?,'hash',true,false)", uniqueDoc(), adminEmail, "3000000000");
+        Long admin = jdbc.queryForObject("select id from users where email=?", Long.class, adminEmail);
+        String userToken = jwt.access(patient, Set.of("USER")); String adminToken = jwt.access(admin, Set.of("ADMIN"));
+
+        mvc.perform(get("/api/v1/availability").param("locationId", location.toString()).param("specialtyId", general.toString()).param("date", date.toString()).header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].professionalId").value(professional));
+        mvc.perform(post("/api/v1/appointments").header("Authorization", "Bearer " + userToken).contentType(MediaType.APPLICATION_JSON).content("""
+                {"professionalId":%d,"locationId":%d,"specialtyId":%d,"date":"%s","startTime":"08:00","reason":"General"}
+                """.formatted(professional, location, general, date)))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.status").value("APPROVED"));
+        mvc.perform(get("/api/v1/appointments/mine").param("status", "APPROVED").param("date", date.toString()).header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].professionalName").value("Ruta Profesional"))
+                .andExpect(jsonPath("$[0].specialtyName").value("General " + suffix)).andExpect(jsonPath("$[0].durationMinutes").value(30))
+                .andExpect(jsonPath("$[0].status").value("APPROVED"));
+        mvc.perform(post("/api/v1/appointments").header("Authorization", "Bearer " + userToken).contentType(MediaType.APPLICATION_JSON).content("""
+                {"professionalId":%d,"locationId":%d,"specialtyId":%d,"date":"%s","startTime":"09:00","reason":"Especializada"}
+                """.formatted(professional, location, specialized, date)))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.status").value("REQUESTED"));
+        String pending = mvc.perform(get("/api/v1/admin/appointments/pending-specialized").header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        // Other suites may leave pending requests in the persistent test DB: decide only on this test's request.
+        com.fasterxml.jackson.databind.JsonNode own = null;
+        for (var item : mapper.readTree(pending)) if (("Especializada " + suffix).equals(item.get("specialtyName").asText())) own = item;
+        assertThat(own).isNotNull();
+        assertThat(own.get("durationMinutes").asInt()).isEqualTo(60);
+        Long appointment = own.get("id").asLong();
+        mvc.perform(post("/api/v1/admin/appointments/{id}/decision", appointment).header("Authorization", "Bearer " + adminToken).contentType(MediaType.APPLICATION_JSON).content("{" + "\"decision\":\"REJECT\",\"reason\":\"Sin disponibilidad\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("REJECTED"));
+        mvc.perform(get("/api/v1/appointments/mine").param("status", "REJECTED").header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].rejectionReason").value("Sin disponibilidad"));
+        mvc.perform(get("/api/v1/appointments/mine").header("Authorization", "Bearer " + jwt.access(patient + 999L, Set.of("USER"))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
     }
 
     @Test void simultaneousRefreshAllowsOnlyOneRotation() throws Exception {

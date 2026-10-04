@@ -41,6 +41,18 @@ class AccountJpaAdapter implements Ports.Accounts {
         return toDomain(users.saveAndFlush(entity));
     }
 
+    public Account updatePhone(Long userId, String phone) {
+        UserEntity entity = users.findById(userId).orElseThrow();
+        entity.phone = phone;
+        return toDomain(users.saveAndFlush(entity));
+    }
+
+    public void updatePasswordHash(Long userId, String passwordHash) {
+        UserEntity entity = users.findById(userId).orElseThrow();
+        entity.passwordHash = passwordHash;
+        users.saveAndFlush(entity);
+    }
+
     private Account toDomain(UserEntity e) {
         return new Account(e.id, e.firstName, e.lastName, e.documentType,
                 e.documentNumber, e.email, e.phone, e.passwordHash,

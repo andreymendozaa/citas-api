@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class AuthService {
     public record Registration(String firstName, String lastName, String documentType,
-                               String documentNumber, String email, String phone, String password) {}
+                               String documentNumber, String email, String phone, String password, Long insurancePlanId) {}
     public record Tokens(String accessToken, String refreshToken, long expiresIn) {}
 
     private final Ports.Accounts accounts;
@@ -21,15 +21,17 @@ public class AuthService {
     private final Ports.Tokens tokens;
     private final Ports.Transactions transactions;
     private final Clock clock;
+    private final Ports.Affiliations affiliations;
 
     public AuthService(Ports.Accounts accounts, Ports.Sessions sessions, Ports.Passwords passwords,
-                       Ports.Tokens tokens, Ports.Transactions transactions, Clock clock) {
+                       Ports.Tokens tokens, Ports.Transactions transactions, Clock clock, Ports.Affiliations affiliations) {
         this.accounts = accounts;
         this.sessions = sessions;
         this.passwords = passwords;
         this.tokens = tokens;
         this.transactions = transactions;
         this.clock = clock;
+        this.affiliations = affiliations;
     }
 
     public Account register(Registration input) {
@@ -44,7 +46,9 @@ public class AuthService {
             Account account = new Account(null, Identity.required(input.firstName()),
                     Identity.required(input.lastName()), type, number, email,
                     Identity.required(input.phone()), passwords.hash(password), Set.of("USER"));
-            return accounts.save(account);
+            Account saved = accounts.save(account);
+            if (input.insurancePlanId() != null) affiliations.createCurrent(saved.id(), input.insurancePlanId());
+            return saved;
         });
     }
 

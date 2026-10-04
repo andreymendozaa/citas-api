@@ -19,3 +19,43 @@ Los ocho subagentes especializados se mantienen como archivos Markdown versionad
 ## HECHO — 2026-09-22 · Frontend
 
 React es el framework detectado en `citas-web`; deja de ser una pregunta abierta. La aprobación visual y la verificación del incremento auth continúan pendientes de evidencia.
+
+## DECISIÓN — 2026-10-04 · Instancia n8n compartida
+
+La cuenta de n8n entregada por el trainer es compartida por varios estudiantes. Todo workflow y credencial del proyecto lleva el prefijo `Andrey`; no se leen, ejecutan, modifican ni eliminan recursos ajenos. Se genera un acceso MCP propio del proyecto. La credencial Gmail OAuth2 se crea con la cuenta Google personal del estudiante (autorizado por el usuario).
+
+## DECISIÓN — 2026-10-04 · Alcance de WF-002
+
+WF-002 también notifica reprogramaciones aprobadas y rechazadas; para ello la API emite `appointment.reschedule.decided` (ver [Contratos](contracts.md)).
+
+## DECISIÓN — 2026-10-04 · Parámetros de WF-001 y WF-003
+
+Ventana de recordatorio de 24 h (WF-001; inicialmente 48 h, cambiada por el usuario el mismo día tras la validación) y resumen diario a las 06:00 hora de Bogotá (WF-003). Los correos de laboratorio van al Gmail personal del estudiante, configurado solo en n8n; el JSON versionado conserva `<<LAB_RECIPIENT_EMAIL>>`.
+
+## HECHO — 2026-10-04 · Riesgo en la instancia compartida
+
+Al importar un workflow cuyo nodo referencia una credencial inexistente, n8n asigna automáticamente una credencial existente del mismo tipo, aunque sea de otro estudiante: el webhook de WF-002 quedó apuntando a una credencial ajena. Tras importar o abrir nodos, hay que verificar que cada nodo use solo credenciales `Andrey - …`.
+
+## HECHO — 2026-10-04 · Deduplicación en n8n
+
+En la instancia del trainer, `$getWorkflowStaticData` no persistió entre ejecuciones de producción: el mismo `eventId` generó dos correos (ejecución #121). Los workflows usan ahora el nodo nativo `Remove Duplicates` (`removeItemsSeenInPreviousExecutions`), que sí descartó el reenvío (#128). No usar static data para estado entre ejecuciones en esta instancia.
+
+## DECISIÓN — 2026-10-04 · WF-002 publicado
+
+El usuario autorizó publicar WF-002 y conectar la API real (`N8N_STATUS_WEBHOOK_URL` en el `.env` raíz).
+
+## DECISIÓN — 2026-10-04 · Exposición de la API a n8n (antes pregunta abierta)
+
+n8n corre en la nube y no alcanza `localhost:8080`. Se usa un túnel temporal (Cloudflare quick tunnel) que el usuario abre en su propia terminal, solo durante las pruebas controladas. Su URL efímera se configura únicamente en los nodos `Config` dentro de n8n y nunca se versiona. WF-002 no lo necesita: la API llama a n8n.
+
+## DECISIÓN — 2026-10-04 · Repositorio raíz `citas` público
+
+El usuario decide mantener publicado el repositorio raíz `citas` como repositorio de orquestación (planes, guías, `current-state.md`, prompts). Es una excepción consciente a "solo dos repos públicos" (`RESTRICCIONES_TECNICAS.md`) y a "no inicializar Git en la raíz" (`AGENTS.md`). Los entregables evaluables siguen siendo `citas-api` y `citas-web`. El repo raíz no contiene secretos (`.env` está ignorado).
+
+## DECISIÓN — 2026-10-04 · Calendario USER ("opción A") fuera de alcance
+
+El calendario mensual de disponibilidad para el USER (`PLAN_TRABAJO_CALENDARIO_USER.md`: `GET /availability/days`, `AvailabilityCalendar.tsx`, modal en tres pasos) queda **fuera del alcance de la entrega** y se registra como mejora futura. Ningún CA aprobado lo exige: la reserva por fecha actual cumple RF/HU-020/HU-021. Implementarlo requeriría un cambio cross-repo planificado según `AGENTS.md`.
+
+## DECISIÓN — 2026-10-04 · MCP de n8n con privilegio mínimo
+
+El cliente (Claude Code) se conecta al MCP de la instancia con OAuth (registro local `andrey-n8n`). Los workflows del proyecto se mantienen con `availableInMCP=false` y no se cambia la configuración global del MCP de la instancia compartida. Evidencia y riesgos: `evidence/S5-MCP-contenido-no-confiable-y-riesgos.md`.

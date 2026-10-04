@@ -1,8 +1,14 @@
 package co.com.fcv.training.citas.application;
 
 import co.com.fcv.training.citas.domain.Account;
+import co.com.fcv.training.citas.domain.PasswordResetToken;
 import co.com.fcv.training.citas.domain.RefreshSession;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -16,17 +22,95 @@ public final class Ports {
         Optional<Account> byEmail(String email);
         Optional<Account> byId(Long id);
         Account save(Account account);
+        Account updatePhone(Long userId, String phone);
+        void updatePasswordHash(Long userId, String passwordHash);
     }
 
     public interface Sessions {
         void save(RefreshSession session);
         Optional<RefreshSession> lockByJtiHash(String hash);
         void revoke(Long id, Instant when);
+        void revokeAllByUserId(Long userId, Instant when);
     }
 
     public interface Passwords {
         String hash(String raw);
         boolean matches(String raw, String hash);
+    }
+
+    /** Insurance affiliation of a USER (HU-011): at most one current plan, never two rows for the same plan. */
+    public interface Affiliations {
+        void createCurrent(Long userId, Long planId);
+        Optional<Affiliation> current(Long userId);
+        Affiliation changeCurrent(Long userId, Long planId);
+    }
+
+    public record Affiliation(Long planId, String planCode, String planName, Long epsId, String epsName,
+                              Long regimeId, String regimeName, String membershipNumber) {}
+
+    /** Persistence for password recovery tokens (HU-008/HU-009). */
+    public interface PasswordResets {
+        void save(PasswordResetToken token);
+        Optional<PasswordResetToken> lockByTokenHash(String hash);
+        void markUsed(Long id, Instant when);
+    }
+
+    /** Optional notification of a freshly issued recovery token. Real delivery (email/SMTP) is out of scope;
+     *  in development only the local mailbox (profile "local") implements this. */
+    public interface PasswordResetNotifications {
+        void publish(Long userId, String email, String rawToken, Instant expiresAt);
+    }
+
+    /** Persistence boundary for the scheduling use cases. */
+    public interface Scheduling {
+        List<Map<String,Object>> catalog(String name);
+        List<SchedulingService.Specialty> specialties(boolean activeOnly);
+        List<SchedulingService.Professional> professionals();
+        SchedulingService.Specialty createSpecialty(String code, String name, int duration, boolean general);
+        SchedulingService.Specialty updateSpecialty(Long id, String name, Integer duration, Boolean active);
+        Long createProfessional(String first, String last, String docType, String document, String email, String phone, String passwordHash, String code, String license);
+        void setProfessionalSpecialties(Long professionalId, List<Long> ids, Long primary);
+        void setProfessionalLocations(Long professionalId, List<Long> ids);
+        void setProfessionalActive(Long id, boolean active);
+        SchedulingService.Block createBlock(Long userId, Long locationId, LocalDate date, LocalTime start, LocalTime end);
+        List<SchedulingService.Block> blocks(Long userId, LocalDate date, Long locationId);
+        SchedulingService.Block updateBlock(Long userId, Long id, Long locationId, LocalDate date, LocalTime start, LocalTime end);
+        void deleteBlock(Long userId, Long id);
+        List<SchedulingService.Available> availability(Long locationId, Long specialtyId, Long professionalId, LocalDate date);
+        SchedulingService.Appointment reserve(Long userId, Long professionalId, Long locationId, Long specialtyId, LocalDateTime start, String reason);
+        List<SchedulingService.MyAppointment> appointments(Long userId, String status, LocalDate date);
+        SchedulingService.Appointment cancel(Long userId, Long appointmentId);
+        SchedulingService.RescheduleRequest requestReschedule(Long userId, Long appointmentId, Long locationId, LocalDateTime start);
+        List<SchedulingService.PendingReschedule> pendingReschedules();
+        SchedulingService.RescheduleRequest decideReschedule(Long adminId, Long requestId, String decision, String reason);
+        List<SchedulingService.PendingAppointment> pending();
+        SchedulingService.Appointment decide(Long adminId, Long appointmentId, String decision, String reason);
+        List<SchedulingService.Eps> epsList(boolean activeOnly);
+        SchedulingService.Eps createEps(String code, String name);
+        SchedulingService.Eps updateEps(Long id, String name, Boolean active);
+        List<SchedulingService.EpsPlan> epsPlans(Long epsId);
+        SchedulingService.EpsPlan createEpsPlan(Long epsId, Long regimeId, String code, String name);
+        SchedulingService.EpsPlan updateEpsPlan(Long id, String name, Boolean active);
+        List<SchedulingService.ProfessionalAppointment> professionalAppointments(Long userId, LocalDate from, LocalDate to, Long locationId);
+        SchedulingService.Appointment closeAppointment(Long userId, Long appointmentId, String result, String reason);
+        List<SchedulingService.AppointmentHistoryEntry> history(Long callerId, boolean admin, Long appointmentId);
+        List<SchedulingService.UpcomingAppointment> upcoming(LocalDate from, LocalDate to, Long locationId);
+        List<SchedulingService.InboxItem> inbox(Long locationId, Long professionalId, Long specialtyId, LocalDate date);
+    }
+
+    /** Internal, PII-free domain event published after a relevant appointment status transition commits. */
+    public record AppointmentStatusChanged(Long appointmentId, String previousStatus, String newStatus,
+                                           String source, Long actorUserId, LocalDateTime occurredAt) {}
+
+    /** Internal, PII-free domain event published after an ADMIN decision on a reschedule request commits.
+     *  decision is APPROVED or REJECTED; the appointment status itself does not change. */
+    public record RescheduleDecided(Long appointmentId, Long rescheduleRequestId, String decision,
+                                    Long actorUserId, LocalDateTime occurredAt) {}
+
+    /** Output port towards n8n (WF-002). The HTTP webhook adapter is active only when its URL is configured. */
+    public interface AppointmentEvents {
+        void publish(AppointmentStatusChanged event);
+        default void publish(RescheduleDecided event) { }
     }
 
     public record IssuedRefresh(String value, String jti, Instant expiresAt) {}

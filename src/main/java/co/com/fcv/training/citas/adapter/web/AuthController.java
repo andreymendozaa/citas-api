@@ -2,6 +2,7 @@ package co.com.fcv.training.citas.adapter.web;
 
 import co.com.fcv.training.citas.application.AuthFailure;
 import co.com.fcv.training.citas.application.AuthService;
+import co.com.fcv.training.citas.application.PasswordResetService;
 import co.com.fcv.training.citas.domain.Account;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -23,21 +24,26 @@ class AuthController {
                            @NotBlank @Size(max = 80) String documentNumber,
                            @NotBlank @Size(max = 254) String email,
                            @NotBlank @Size(max = 40) String phone,
-                           @NotBlank String password) {}
+                           @NotBlank String password, Long insurancePlanId) {}
     record RegisterResponse(Long id, String firstName, String lastName, String documentType,
                             String documentNumber, String email, String phone, String role) {}
     record LoginRequest(@NotBlank String email, @NotBlank String password) {}
     record AccessResponse(String accessToken, String tokenType, long expiresIn) {}
+    record PasswordRecoveryRequest(@NotBlank @Size(max = 254) String email) {}
+    record PasswordResetRequest(@NotBlank String token, @NotBlank String newPassword, @NotBlank String confirmation) {}
 
     private final AuthService auth;
+    private final PasswordResetService passwordReset;
     private final boolean secureCookie;
     private final String sameSite;
     private final long refreshDays;
 
-    AuthController(AuthService auth, @Value("${app.cookie.secure}") boolean secureCookie,
+    AuthController(AuthService auth, PasswordResetService passwordReset,
+                   @Value("${app.cookie.secure}") boolean secureCookie,
                    @Value("${app.cookie.same-site}") String sameSite,
                    @Value("${app.jwt.refresh-days}") long refreshDays) {
         this.auth = auth;
+        this.passwordReset = passwordReset;
         this.secureCookie = secureCookie;
         this.sameSite = sameSite;
         this.refreshDays = refreshDays;
@@ -46,7 +52,7 @@ class AuthController {
     @PostMapping("/register")
     ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         Account account = auth.register(new AuthService.Registration(request.firstName(), request.lastName(),
-                request.documentType(), request.documentNumber(), request.email(), request.phone(), request.password()));
+                request.documentType(), request.documentNumber(), request.email(), request.phone(), request.password(), request.insurancePlanId()));
         return ResponseEntity.status(HttpStatus.CREATED).body(new RegisterResponse(account.id(), account.firstName(),
                 account.lastName(), account.documentType(), account.documentNumber(), account.email(), account.phone(), "USER"));
     }
@@ -66,6 +72,18 @@ class AuthController {
     ResponseEntity<Void> logout(@CookieValue(name = "refresh_token", required = false) String token) {
         auth.logout(token);
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, cookie("", Duration.ZERO)).build();
+    }
+
+    @PostMapping("/password-recovery")
+    ResponseEntity<Void> passwordRecovery(@Valid @RequestBody PasswordRecoveryRequest request) {
+        passwordReset.requestRecovery(request.email());
+        return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/password-reset")
+    ResponseEntity<Void> passwordReset(@Valid @RequestBody PasswordResetRequest request) {
+        passwordReset.resetPassword(request.token(), request.newPassword(), request.confirmation());
+        return ResponseEntity.noContent().build();
     }
 
     private ResponseEntity<AccessResponse> tokenResponse(AuthService.Tokens tokens) {

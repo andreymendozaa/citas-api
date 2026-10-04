@@ -31,4 +31,8 @@ class SessionJpaAdapter implements Ports.Sessions {
         e.revokedAt = when;
         sessions.saveAndFlush(e);
     }
+
+    public void revokeAllByUserId(Long userId, Instant when) {
+        sessions.revokeAllByUserId(userId, when);
+    }
 }

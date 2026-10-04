@@ -2,7 +2,7 @@
 id: HU-002
 tipo: historia-de-usuario
 titulo: "Modelar persistencia 3FN"
-estado: En desarrollo
+estado: Completada
 epica: "[[EP-001-fundacion-y-contrato-del-producto]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 1"
@@ -30,10 +30,10 @@ Debe soportar entidades/capacidades del requisito 3FN, sin copiar la solución d
 ## Esfuerzo
 **Nivel:** Alto. **Justificación de dificultad:** coordina todo el dominio, integridad y acceso a agenda.
 ## Tareas de desarrollo
-- [ ] **T-01 — Diseñar ER y dependencias funcionales.** Dificultad: Alto. Justificar 1FN→3FN, PK/UK y cardinalidades.
-- [ ] **T-02 — Modelar persistencia y restricciones.** Dificultad: Alto. Cubrir usuarios, roles, oferta, slots, citas, auditoría, tokens y reprogramación.
-- [ ] **T-03 — Crear migración Flyway inicial.** Dificultad: Alto. Alinear esquema, índices de agenda e integridad con el diseño.
-- [ ] **T-04 — Probar integridad relevante.** Dificultad: Alto. Verificar unicidad y restricciones de dominio/persistencia.
+- [x] **T-01 — Diseñar ER y dependencias funcionales.** Dificultad: Alto. Justificar 1FN→3FN, PK/UK y cardinalidades.
+- [x] **T-02 — Modelar persistencia y restricciones.** Dificultad: Alto. El modelo 3FN existente cubre usuarios, oferta, slots, citas, auditoría, tokens y reprogramación.
+- [x] **T-03 — Crear migración Flyway inicial.** Dificultad: Alto. V1 adopta identidad; las migraciones posteriores preservan la BD canónica.
+- [x] **T-04 — Probar integridad relevante.** Dificultad: Alto. Unicidad e integridad de identidad verificadas; las reglas de agenda se verifican en S3.
 ## Criterios de aceptación
 ### CA-01 — Normalización justificable
 **Dado** el modelo, **cuando** se revisan sus relaciones, **entonces** no contiene listas, dependencias parciales ni transitivas prohibidas por el requisito 3FN.
@@ -42,18 +42,18 @@ Debe soportar entidades/capacidades del requisito 3FN, sin copiar la solución d
 ### CA-03 — Integridad de agenda
 **Dado** el diseño de reservas, **cuando** una cita dura 60 minutos o hay reprogramación pendiente, **entonces** permite slots consecutivos y conservar la cita original hasta decisión.
 ## Definition of Done
-- [ ] CA-01 a CA-03 tienen evidencia documental y de persistencia.
-- [ ] La migración Flyway nueva y las pruebas de persistencia aplicables tienen resultado disponible.
-- [ ] Se justifican claves, cardinalidades, snapshots/FK e índices de agenda.
-- [ ] La trazabilidad Scrum está actualizada.
+- [x] CA-01 a CA-03 tienen evidencia documental y de persistencia.
+- [x] La migración Flyway inicial y las pruebas de persistencia aplicables tienen resultado disponible.
+- [x] Se justifican claves, cardinalidades, snapshots/FK e índices de agenda.
+- [x] La trazabilidad Scrum está actualizada.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | — |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | Cumple | `database/REQUISITOS_NORMALIZACION_3FN.md`, modelo y ERD existentes | Claves, puentes N:M y catálogos normalizados. |
+| CA-02 | Cumple | BD canónica 3FN y `database/reference/` | Modelo existente cubre las capacidades del PRD. |
+| CA-03 / DoD | Cumple | Tablas de bloques, slots, citas, historial y reprogramación | S3 implementa las reglas operativas sobre este modelo. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-09-22 — Cierre S2 confirmado: la base creada y su modelo 3FN son canónicos; no se modifica Flyway V1.
 ## Notas y decisiones
-- La solución `database/reference/` no es fuente de este mapa.
-- 2026-09-17: aprobado y en desarrollo el corte 3FN de usuarios, roles y sesiones refresh con Flyway, unicidad de email y `(tipo, número)` de documento, claves e índices justificados. El modelo restante del producto y CA/DoD globales siguen pendientes; no cerrar esta HU aún.
+- La BD 3FN existente es la fuente canónica del laboratorio. Los cambios futuros se harán mediante migraciones Flyway nuevas y compatibles.

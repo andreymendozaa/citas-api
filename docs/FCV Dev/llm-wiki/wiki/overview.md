@@ -8,4 +8,4 @@ El workspace académico contiene dos repositorios independientes: backend Spring
 
 El frontend ya usa React 19, TypeScript y Vite. El working tree contiene componentes importados, un cliente de autenticación y pruebas que deben verificarse antes de declarar completa la integración.
 
-El contrato REST aprobado cubre registro, login, refresh y logout bajo `/api/v1/auth`. Los contratos de las demás capacidades continúan pendientes.
+El contrato REST aprobado cubre identidad bajo `/api/v1/auth` y el corte S3 de catálogos, oferta, disponibilidad, reservas y decisión ADMIN bajo `/api/v1`. El frontend consume ambos contratos directamente.
