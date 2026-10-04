@@ -37,7 +37,7 @@
             {
               "id": "cfg-window",
               "name": "REMINDER_WINDOW_HOURS",
-              "value": 48,
+              "value": 24,
               "type": "number"
             }
           ]
@@ -134,7 +134,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// WF-001: keep APPROVED appointments (the endpoint only returns APPROVED) whose start is inside the window and\n// drop personal fields. Reminders already sent are removed by the next node, keyed by appointment id + start time\n// (a rescheduled appointment gets a new key and a new reminder).\nconst cfg = $('Config').first().json;\nconst zone = 'America/Bogota';\nconst windowHours = Number(cfg.REMINDER_WINDOW_HOURS || 48);\nconst now = DateTime.now().setZone(zone);\nconst limit = now.plus({ hours: windowHours });\nlet read = 0, outside = 0;\nconst toSend = [];\nfor (const item of $input.all()) {\n  const a = item.json;\n  if (!a || a.id === undefined || !a.startAt) continue;\n  read++;\n  if (a.status && a.status !== 'APPROVED') { outside++; continue; }\n  const start = DateTime.fromISO(a.startAt, { zone });\n  const end = DateTime.fromISO(a.endAt, { zone });\n  if (!(start > now && start <= limit)) { outside++; continue; }\n  const key = a.id + '|' + a.startAt;\n  toSend.push({ json: {\n    key,\n    startAt: a.startAt,\n    appointmentId: a.id,\n    date: start.setLocale('es').toFormat(\"cccc d 'de' LLLL 'de' yyyy\"),\n    time: start.toFormat('HH:mm') + ' - ' + end.toFormat('HH:mm'),\n    location: a.locationName,\n    specialty: a.specialtyName,\n    professional: a.professionalName\n  } });\n}\n$execution.customData.set('read', String(read));\n$execution.customData.set('outsideWindow', String(outside));\n$execution.customData.set('inWindow', String(toSend.length));\n$execution.customData.set('sent', '0');\nreturn toSend;"
+        "jsCode": "// WF-001: keep APPROVED appointments (the endpoint only returns APPROVED) whose start is inside the window and\n// drop personal fields. Reminders already sent are removed by the next node, keyed by appointment id + start time\n// (a rescheduled appointment gets a new key and a new reminder).\nconst cfg = $('Config').first().json;\nconst zone = 'America/Bogota';\nconst windowHours = Number(cfg.REMINDER_WINDOW_HOURS || 24);\nconst now = DateTime.now().setZone(zone);\nconst limit = now.plus({ hours: windowHours });\nlet read = 0, outside = 0;\nconst toSend = [];\nfor (const item of $input.all()) {\n  const a = item.json;\n  if (!a || a.id === undefined || !a.startAt) continue;\n  read++;\n  if (a.status && a.status !== 'APPROVED') { outside++; continue; }\n  const start = DateTime.fromISO(a.startAt, { zone });\n  const end = DateTime.fromISO(a.endAt, { zone });\n  if (!(start > now && start <= limit)) { outside++; continue; }\n  const key = a.id + '|' + a.startAt;\n  toSend.push({ json: {\n    key,\n    startAt: a.startAt,\n    appointmentId: a.id,\n    date: start.setLocale('es').toFormat(\"cccc d 'de' LLLL 'de' yyyy\"),\n    time: start.toFormat('HH:mm') + ' - ' + end.toFormat('HH:mm'),\n    location: a.locationName,\n    specialty: a.specialtyName,\n    professional: a.professionalName\n  } });\n}\n$execution.customData.set('read', String(read));\n$execution.customData.set('outsideWindow', String(outside));\n$execution.customData.set('inWindow', String(toSend.length));\n$execution.customData.set('sent', '0');\nreturn toSend;"
       },
       "id": "b1a0f001-0000-4000-8000-000000000006",
       "name": "Filtrar ventana",

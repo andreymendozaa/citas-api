@@ -46,11 +46,12 @@ Automatización prevista para S5/S6; usa instancia central del trainer y credenc
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | PASS | `evidence/S5-WF-001-WF-003.md` (#171 envío, #172 sin duplicado, #169 rama de error) | Ventana de 48 h aprobada por el usuario; el correo no incluye datos personales del paciente. |
+| CA-01 | PASS | `evidence/S5-WF-001-WF-003.md` (#171 envío, #172 sin duplicado, #169 rama de error) | Ventana vigente de 24 h por decisión del usuario (las pruebas se hicieron con 48 h); el correo no incluye datos personales del paciente. |
 | CA-02 | PASS | Estructura de `WF-001-appointment-reminders.json` | Solo login y `GET`; ningún endpoint de escritura. |
 | CA-03 / DoD | PASS | `automations/n8n/WF-001-appointment-reminders.json` + `check-workflows.mjs` | Sin credenciales, URLs ni correos (marcadores `<<...>>`). |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
 - 2026-10-04 — Aprobada por el usuario (ventana de 48 h). Validada con las ejecuciones controladas #169, #171 y #172 a través de un túnel temporal. Estado: `Completada`.
+- 2026-10-04 — El usuario cambia la ventana de recordatorio a 24 h (`REMINDER_WINDOW_HOURS=24`).
 ## Notas y decisiones
 - No se presupone cuándo se considera “próxima”; requiere configuración aprobada.

@@ -30,7 +30,7 @@ WF-002 también notifica reprogramaciones aprobadas y rechazadas; para ello la A
 
 ## DECISIÓN — 2026-10-04 · Parámetros de WF-001 y WF-003
 
-Ventana de recordatorio de 48 h (WF-001) y resumen diario a las 06:00 hora de Bogotá (WF-003). Los correos de laboratorio van al Gmail personal del estudiante, configurado solo en n8n; el JSON versionado conserva `<<LAB_RECIPIENT_EMAIL>>`.
+Ventana de recordatorio de 24 h (WF-001; inicialmente 48 h, cambiada por el usuario el mismo día tras la validación) y resumen diario a las 06:00 hora de Bogotá (WF-003). Los correos de laboratorio van al Gmail personal del estudiante, configurado solo en n8n; el JSON versionado conserva `<<LAB_RECIPIENT_EMAIL>>`.
 
 ## HECHO — 2026-10-04 · Riesgo en la instancia compartida
 
