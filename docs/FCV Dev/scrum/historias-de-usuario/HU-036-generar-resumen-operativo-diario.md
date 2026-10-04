@@ -2,7 +2,7 @@
 id: HU-036
 tipo: historia-de-usuario
 titulo: "Generar resumen operativo diario"
-estado: Pendiente de aprobación
+estado: En desarrollo
 epica: "[[EP-008-cliente-web-y-automatizaciones-posteriores]]"
 esfuerzo: Alto
 sprint_sugerido: "Incremento 7"
@@ -30,8 +30,8 @@ Es el caso adicional de automatización S5/S6 descrito por el PRD.
 **Nivel:** Alto. **Justificación de dificultad:** define agregación operativa, automatización y minimización de datos.
 ## Tareas de desarrollo
 - [ ] **T-01 — Acordar consulta agregada.** Dificultad: Alto. Precisar periodo, estados y campos mínimos por sede.
-- [ ] **T-02 — Configurar workflow diario.** Dificultad: Alto. Ejecutar en instancia trainer y entregar salida aprobada.
-- [ ] **T-03 — Exportar/verificar seguridad.** Dificultad: Medio. Versionar JSON sin secretos y probar datos sintéticos.
+- [x] **T-02 — Configurar workflow diario.** Dificultad: Alto. Ejecutar en instancia trainer y entregar salida aprobada.
+- [x] **T-03 — Exportar/verificar seguridad.** Dificultad: Medio. Versionar JSON sin secretos y probar datos sintéticos.
 ## Criterios de aceptación
 ### CA-01 — Agregación por sede/estado
 **Dado** citas sintéticas con diversos estados y sedes, **cuando** corre el flujo diario, **entonces** produce el resumen agrupado por sede y estado.
@@ -46,10 +46,11 @@ Es el caso adicional de automatización S5/S6 descrito por el PRD.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
-| CA-01 | Pendiente | — | Depende de definición operativa. |
-| CA-02 | Pendiente | — | — |
-| CA-03 / DoD | Pendiente | — | — |
+| CA-01 | PARCIAL | `evidence/S5-WF-001-WF-003.md` (#173) | Resumen enviado (por sede, por especialidad y pendientes de la bandeja). Falta una ejecución con citas del día; COMPLETED/NO_SHOW/CANCELLED no tienen agregado en la API (brecha B4). |
+| CA-02 | PASS | Estructura de `WF-003-daily-operational-summary.json` | Solo login y `GET`. |
+| CA-03 | PASS | `automations/n8n/WF-003-daily-operational-summary.json` + `check-workflows.mjs` | Sin credenciales; el DoD queda pendiente por CA-01. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Pendiente de aprobación`.
+- 2026-10-04 — Aprobada por el usuario (06:00 Bogotá, buzón de laboratorio). Ejecución controlada #173. Estado: `En desarrollo` (CA-01 parcial).
 ## Notas y decisiones
 - Pregunta abierta: destinatario/canal del resumen, fuera del PRD.

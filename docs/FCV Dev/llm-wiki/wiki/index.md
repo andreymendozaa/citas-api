@@ -27,7 +27,9 @@ Actualización del 2026-10-04 (S5, backend):
 
 Actualización del 2026-10-04 (S6): WF-002 publicado y validado de extremo a extremo; HU-035 `Completada` (global 33). Ver [Trazabilidad](traceability.md).
 
-Siguiente hito: validar WF-001 y WF-003 (HU-034, HU-036) cuando exista el túnel hacia la API, y cerrar la evidencia de MCP de S5 (ver [Decisiones](decisions.md)).
+Actualización del 2026-10-04: WF-001 validado y HU-034 `Completada`; WF-003 ejecutado, con HU-036 `En desarrollo` por CA-01 parcial (global 34).
+
+Siguiente hito: evidencia MCP y riesgos residuales de S5, cierre de HU-033 y HU-036, LOOP_03 y merge a `main`.
 
 ## Lectura recomendada
 

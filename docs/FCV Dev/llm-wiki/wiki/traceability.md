@@ -118,6 +118,10 @@ Estado global: 32 `Completada`, 1 `En progreso` (HU-033) y 3 `Pendiente de aprob
 
 Estado global: 33 `Completada`, 1 `En progreso` (HU-033) y 2 `Pendiente de aprobación` (HU-034, HU-036).
 
+**HECHO — 2026-10-04 · WF-001 y WF-003.** Validados con ejecuciones manuales controladas a través de un túnel temporal; los workflows siguen sin publicar. HU-034 pasa a `Completada`: envío (#171), sin duplicado (#172) y rama de error (#169). HU-036 queda `En desarrollo`: envío correcto (#173), pero CA-01 es parcial porque faltan datos del día y la API no tiene agregado por estado (brecha B4). Evidencia: `evidence/S5-WF-001-WF-003.md`.
+
+Estado global: 34 `Completada`, 1 `En progreso` (HU-033) y 1 `En desarrollo` (HU-036).
+
 **HECHO — entorno.** En Docker sobre Windows, el vigilante de archivos de Vite no detecta cambios hechos desde el host. Tras editar `citas-web` hay que reiniciar `npm run dev`, o lanzarlo con sondeo, para verlos en `localhost:5173`.
 
 **PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.
