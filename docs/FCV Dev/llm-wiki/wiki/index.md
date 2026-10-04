@@ -25,7 +25,9 @@ Actualización del 2026-10-04 (S5, backend):
 - Webhook real WF-002 listo en la API, incluidos los eventos de reprogramación: ver [Contratos](contracts.md).
 - Estado global: 32 HU `Completada`.
 
-Siguiente hito: workflows n8n WF-001/002/003 (HU-034 a 036) en la instancia compartida, con el prefijo `Andrey` (ver [Decisiones](decisions.md)).
+Actualización del 2026-10-04 (S6): WF-002 publicado y validado de extremo a extremo; HU-035 `Completada` (global 33). Ver [Trazabilidad](traceability.md).
+
+Siguiente hito: validar WF-001 y WF-003 (HU-034, HU-036) cuando exista el túnel hacia la API, y cerrar la evidencia de MCP de S5 (ver [Decisiones](decisions.md)).
 
 ## Lectura recomendada
 

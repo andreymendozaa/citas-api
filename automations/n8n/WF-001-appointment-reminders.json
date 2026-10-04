@@ -134,13 +134,29 @@
     },
     {
       "parameters": {
-        "jsCode": "// WF-001: keep APPROVED appointments (the endpoint only returns APPROVED) whose start is inside the window,\n// drop personal fields and skip reminders already sent for the same appointment and start time.\nconst cfg = $('Config').first().json;\nconst zone = 'America/Bogota';\nconst windowHours = Number(cfg.REMINDER_WINDOW_HOURS || 48);\nconst now = DateTime.now().setZone(zone);\nconst limit = now.plus({ hours: windowHours });\nconst store = $getWorkflowStaticData('global');\nstore.sent = store.sent || {};\nfor (const [key, startAt] of Object.entries(store.sent)) {\n  if (DateTime.fromISO(startAt, { zone }) < now) delete store.sent[key];\n}\nlet read = 0, outside = 0, duplicates = 0;\nconst toSend = [];\nfor (const item of $input.all()) {\n  const a = item.json;\n  if (!a || a.id === undefined || !a.startAt) continue;\n  read++;\n  if (a.status && a.status !== 'APPROVED') { outside++; continue; }\n  const start = DateTime.fromISO(a.startAt, { zone });\n  const end = DateTime.fromISO(a.endAt, { zone });\n  if (!(start > now && start <= limit)) { outside++; continue; }\n  const key = a.id + '|' + a.startAt;\n  if (store.sent[key]) { duplicates++; continue; }\n  toSend.push({ json: {\n    key,\n    startAt: a.startAt,\n    appointmentId: a.id,\n    date: start.setLocale('es').toFormat(\"cccc d 'de' LLLL 'de' yyyy\"),\n    time: start.toFormat('HH:mm') + ' - ' + end.toFormat('HH:mm'),\n    location: a.locationName,\n    specialty: a.specialtyName,\n    professional: a.professionalName\n  } });\n}\n$execution.customData.set('read', String(read));\n$execution.customData.set('outsideWindow', String(outside));\n$execution.customData.set('duplicates', String(duplicates));\n$execution.customData.set('toSend', String(toSend.length));\nreturn toSend;"
+        "jsCode": "// WF-001: keep APPROVED appointments (the endpoint only returns APPROVED) whose start is inside the window and\n// drop personal fields. Reminders already sent are removed by the next node, keyed by appointment id + start time\n// (a rescheduled appointment gets a new key and a new reminder).\nconst cfg = $('Config').first().json;\nconst zone = 'America/Bogota';\nconst windowHours = Number(cfg.REMINDER_WINDOW_HOURS || 48);\nconst now = DateTime.now().setZone(zone);\nconst limit = now.plus({ hours: windowHours });\nlet read = 0, outside = 0;\nconst toSend = [];\nfor (const item of $input.all()) {\n  const a = item.json;\n  if (!a || a.id === undefined || !a.startAt) continue;\n  read++;\n  if (a.status && a.status !== 'APPROVED') { outside++; continue; }\n  const start = DateTime.fromISO(a.startAt, { zone });\n  const end = DateTime.fromISO(a.endAt, { zone });\n  if (!(start > now && start <= limit)) { outside++; continue; }\n  const key = a.id + '|' + a.startAt;\n  toSend.push({ json: {\n    key,\n    startAt: a.startAt,\n    appointmentId: a.id,\n    date: start.setLocale('es').toFormat(\"cccc d 'de' LLLL 'de' yyyy\"),\n    time: start.toFormat('HH:mm') + ' - ' + end.toFormat('HH:mm'),\n    location: a.locationName,\n    specialty: a.specialtyName,\n    professional: a.professionalName\n  } });\n}\n$execution.customData.set('read', String(read));\n$execution.customData.set('outsideWindow', String(outside));\n$execution.customData.set('inWindow', String(toSend.length));\n$execution.customData.set('sent', '0');\nreturn toSend;"
       },
       "id": "b1a0f001-0000-4000-8000-000000000006",
-      "name": "Filtrar y deduplicar",
+      "name": "Filtrar ventana",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [1100, 200]
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "logic": "removeItemsWithAlreadySeenKeyValues",
+        "dedupeValue": "={{ $json.key }}",
+        "options": {
+          "scope": "node",
+          "historySize": 10000
+        }
+      },
+      "id": "b1a0f001-0000-4000-8000-00000000000c",
+      "name": "Descartar ya recordadas",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [1210, 60]
     },
     {
       "parameters": {
@@ -169,7 +185,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Mark reminders as sent only after Gmail accepted them (static data persists in production executions).\nconst store = $getWorkflowStaticData('global');\nstore.sent = store.sent || {};\nconst sent = $input.all().map((_, i) => $('Filtrar y deduplicar').itemMatching(i));\nfor (const item of sent) store.sent[item.json.key] = item.json.startAt;\n$execution.customData.set('sent', String(sent.length));\nreturn [{ json: { result: 'sent', count: sent.length } }];"
+        "jsCode": "// Gmail accepted these reminders. Keys were already recorded by 'Descartar ya recordadas'.\nconst sent = $input.all().length;\n$execution.customData.set('sent', String(sent));\nreturn [{ json: { result: 'sent', count: sent } }];"
       },
       "id": "b1a0f001-0000-4000-8000-000000000008",
       "name": "Registrar enviados",
@@ -229,11 +245,14 @@
     },
     "Consultar citas proximas": {
       "main": [
-        [{ "node": "Filtrar y deduplicar", "type": "main", "index": 0 }],
+        [{ "node": "Filtrar ventana", "type": "main", "index": 0 }],
         [{ "node": "API no disponible", "type": "main", "index": 0 }]
       ]
     },
-    "Filtrar y deduplicar": {
+    "Filtrar ventana": {
+      "main": [[{ "node": "Descartar ya recordadas", "type": "main", "index": 0 }]]
+    },
+    "Descartar ya recordadas": {
       "main": [[{ "node": "Enviar recordatorio (Gmail)", "type": "main", "index": 0 }]]
     },
     "Enviar recordatorio (Gmail)": {

@@ -32,9 +32,9 @@ La evidencia de cada CA está en la tabla de cada HU.
 
 | Estado | Cantidad | HU |
 |---|---|---|
-| `Completada` | 32 | HU-001 a HU-032 (HU-004 cerrada el 2026-10-04 con OpenAPI) |
+| `Completada` | 33 | HU-001 a HU-032 y HU-035 (HU-004 con OpenAPI y HU-035 con WF-002, ambas el 2026-10-04) |
 | `En progreso` | 1 | HU-033 |
-| `Pendiente de aprobación` | 3 | HU-034, 035, 036 |
+| `Pendiente de aprobación` | 2 | HU-034, 036 (workflows importados; falta el túnel para validarlos) |
 
 Actualización del mismo día: HU-026, HU-027 y HU-028 pasan a `Completada` con `AppointmentLifecycleIntegrationTest` (8 casos) y 4 pruebas de cliente. Las pruebas destaparon un bug: se respondía un error 500 ante una cita ajena o inexistente y ante una solicitud ya resuelta; se corrigió siguiendo Red → Green.
 

@@ -36,6 +36,14 @@ Ventana de recordatorio de 48 h (WF-001) y resumen diario a las 06:00 hora de Bo
 
 Al importar un workflow cuyo nodo referencia una credencial inexistente, n8n asigna automáticamente una credencial existente del mismo tipo, aunque sea de otro estudiante: el webhook de WF-002 quedó apuntando a una credencial ajena. Tras importar o abrir nodos, hay que verificar que cada nodo use solo credenciales `Andrey - …`.
 
+## HECHO — 2026-10-04 · Deduplicación en n8n
+
+En la instancia del trainer, `$getWorkflowStaticData` no persistió entre ejecuciones de producción: el mismo `eventId` generó dos correos (ejecución #121). Los workflows usan ahora el nodo nativo `Remove Duplicates` (`removeItemsSeenInPreviousExecutions`), que sí descartó el reenvío (#128). No usar static data para estado entre ejecuciones en esta instancia.
+
+## DECISIÓN — 2026-10-04 · WF-002 publicado
+
+El usuario autorizó publicar WF-002 y conectar la API real (`N8N_STATUS_WEBHOOK_URL` en el `.env` raíz). También decidió no rotar el token del webhook, aunque se mostró una vez en el chat de trabajo (riesgo residual aceptado).
+
 ## PREGUNTA ABIERTA — 2026-10-04 · Exposición de la API a n8n
 
 n8n corre en la nube y no alcanza `localhost:8080`. La opción propuesta es un túnel temporal (Cloudflare quick tunnel) abierto solo durante las pruebas controladas. Requiere autorización explícita del usuario en la configuración de permisos, porque expone la API local a Internet (protegida por JWT).
