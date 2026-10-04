@@ -28,6 +28,14 @@ La cuenta de n8n entregada por el trainer es compartida por varios estudiantes. 
 
 WF-002 también notifica reprogramaciones aprobadas y rechazadas; para ello la API emite `appointment.reschedule.decided` (ver [Contratos](contracts.md)).
 
+## DECISIÓN — 2026-10-04 · Parámetros de WF-001 y WF-003
+
+Ventana de recordatorio de 48 h (WF-001) y resumen diario a las 06:00 hora de Bogotá (WF-003). Los correos de laboratorio van al Gmail personal del estudiante, configurado solo en n8n; el JSON versionado conserva `<<LAB_RECIPIENT_EMAIL>>`.
+
+## HECHO — 2026-10-04 · Riesgo en la instancia compartida
+
+Al importar un workflow cuyo nodo referencia una credencial inexistente, n8n asigna automáticamente una credencial existente del mismo tipo, aunque sea de otro estudiante: el webhook de WF-002 quedó apuntando a una credencial ajena. Tras importar o abrir nodos, hay que verificar que cada nodo use solo credenciales `Andrey - …`.
+
 ## PREGUNTA ABIERTA — 2026-10-04 · Exposición de la API a n8n
 
 n8n corre en la nube y no alcanza `localhost:8080`. La opción propuesta es un túnel temporal (Cloudflare quick tunnel) abierto solo durante las pruebas controladas. Requiere autorización explícita del usuario en la configuración de permisos, porque expone la API local a Internet (protegida por JWT).
