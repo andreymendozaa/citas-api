@@ -42,7 +42,7 @@ En la instancia del trainer, `$getWorkflowStaticData` no persistió entre ejecuc
 
 ## DECISIÓN — 2026-10-04 · WF-002 publicado
 
-El usuario autorizó publicar WF-002 y conectar la API real (`N8N_STATUS_WEBHOOK_URL` en el `.env` raíz). También decidió no rotar el token del webhook, aunque se mostró una vez en el chat de trabajo (riesgo residual aceptado).
+El usuario autorizó publicar WF-002 y conectar la API real (`N8N_STATUS_WEBHOOK_URL` en el `.env` raíz).
 
 ## PREGUNTA ABIERTA — 2026-10-04 · Exposición de la API a n8n
 

@@ -61,6 +61,5 @@ Cuentas sintéticas `lab.*`; especialidad "Dermatología Laboratorio", sede HIC.
 ## Riesgos residuales
 
 - Cuenta n8n compartida: otros usuarios con acceso al proyecto "Personal" pueden ver el workflow y sus ejecuciones. Al importar, n8n asignó automáticamente una credencial ajena (corregido; ver la wiki `decisions.md`).
-- El token del webhook se mostró una vez en el chat de trabajo; por decisión del usuario no se rota.
 - La app OAuth de Google está en modo de prueba: solo el usuario de prueba puede autorizarla y el refresh token puede caducar a los 7 días; habría que reconectarla.
 - Entrega del emisor *best-effort* (1 reintento); un evento perdido no se reintenta después.
