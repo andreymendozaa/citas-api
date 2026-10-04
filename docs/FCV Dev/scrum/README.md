@@ -32,8 +32,7 @@ La evidencia de cada CA está en la tabla de cada HU.
 
 | Estado | Cantidad | HU |
 |---|---|---|
-| `Completada` | 31 | HU-001 a HU-003, HU-005 a HU-032 |
-| `En desarrollo` | 1 | HU-004 (OpenAPI, previsto en S5) |
+| `Completada` | 32 | HU-001 a HU-032 (HU-004 cerrada el 2026-10-04 con OpenAPI) |
 | `En progreso` | 1 | HU-033 |
 | `Pendiente de aprobación` | 3 | HU-034, 035, 036 |
 

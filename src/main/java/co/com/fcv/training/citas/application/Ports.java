@@ -102,10 +102,15 @@ public final class Ports {
     public record AppointmentStatusChanged(Long appointmentId, String previousStatus, String newStatus,
                                            String source, Long actorUserId, LocalDateTime occurredAt) {}
 
-    /** Output port for n8n readiness. Inactive by default; S5/S6 will wire the real HTTP webhook adapter here
-     *  without touching the call sites in SchedulingJdbcAdapter. */
+    /** Internal, PII-free domain event published after an ADMIN decision on a reschedule request commits.
+     *  decision is APPROVED or REJECTED; the appointment status itself does not change. */
+    public record RescheduleDecided(Long appointmentId, Long rescheduleRequestId, String decision,
+                                    Long actorUserId, LocalDateTime occurredAt) {}
+
+    /** Output port towards n8n (WF-002). The HTTP webhook adapter is active only when its URL is configured. */
     public interface AppointmentEvents {
         void publish(AppointmentStatusChanged event);
+        default void publish(RescheduleDecided event) { }
     }
 
     public record IssuedRefresh(String value, String jti, Instant expiresAt) {}

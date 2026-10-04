@@ -20,7 +20,12 @@ Auditoría del 2026-09-30:
 - Las nuevas pruebas corrigieron 4 errores 500 y la edición y eliminación de bloques pasados.
 - Brechas funcionales y entregables S5/S6 pendientes: ver [Trazabilidad](traceability.md).
 
-Siguiente hito: cerrar esas brechas y luego S5 (Swagger, `current-state.md`, webhook n8n real).
+Actualización del 2026-10-04 (S5, backend):
+- HU-004/RF-20 `Completada`: OpenAPI publicado en `/v3/api-docs` y copia en `docs/openapi/openapi-v1.json`. `GET /actuator/health` público.
+- Webhook real WF-002 listo en la API, incluidos los eventos de reprogramación: ver [Contratos](contracts.md).
+- Estado global: 32 HU `Completada`.
+
+Siguiente hito: workflows n8n WF-001/002/003 (HU-034 a 036) en la instancia compartida, con el prefijo `Andrey` (ver [Decisiones](decisions.md)).
 
 ## Lectura recomendada
 

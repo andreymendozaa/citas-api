@@ -14,6 +14,20 @@ spring:
 server:
   error:
     include-message: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  paths-to-match: /api/v1/**
 app:
   jwt:
     issuer: citas-api
@@ -28,3 +42,8 @@ app:
     same-site: ${REFRESH_COOKIE_SAME_SITE:None}
   password-reset:
     ttl-minutes: ${PASSWORD_RESET_TTL_MINUTES:30}
+  n8n:
+    status-webhook:
+      # Empty URL keeps the no-op adapter (no outbound calls). Values come only from the environment.
+      url: ${N8N_STATUS_WEBHOOK_URL:}
+      bearer-token: ${N8N_STATUS_WEBHOOK_BEARER_TOKEN:}

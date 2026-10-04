@@ -20,7 +20,8 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import static org.assertj.core.api.Assertions.*;
 
-/** n8n-prep: AppointmentStatusChanged fires only for admin decisions and user cancellations, after commit. */
+/** WF-002: AppointmentStatusChanged fires only for admin decisions and user cancellations, and RescheduleDecided for
+ *  admin reschedule decisions; both after commit. */
 @SpringBootTest
 @Import(AppointmentEventsIntegrationTest.CapturingEvents.class)
 class AppointmentEventsIntegrationTest extends DatabaseIntegrationSupport {
@@ -30,7 +31,9 @@ class AppointmentEventsIntegrationTest extends DatabaseIntegrationSupport {
 
     static class CapturingAppointmentEvents implements Ports.AppointmentEvents {
         final List<Ports.AppointmentStatusChanged> events = new CopyOnWriteArrayList<>();
+        final List<Ports.RescheduleDecided> reschedules = new CopyOnWriteArrayList<>();
         public void publish(Ports.AppointmentStatusChanged event) { events.add(event); }
+        public void publish(Ports.RescheduleDecided event) { reschedules.add(event); }
     }
     @TestConfiguration
     static class CapturingEvents {
@@ -41,7 +44,7 @@ class AppointmentEventsIntegrationTest extends DatabaseIntegrationSupport {
     @Autowired JdbcTemplate jdbc;
     @Autowired CapturingAppointmentEvents events;
 
-    @Test void publishesOnlyForAdminDecisionsAndUserCancellationNotForAutoApprovalOrReschedule() {
+    @Test void publishesStatusChangesForAdminDecisionsAndUserCancellationAndReschedulesSeparately() {
         String suffix = UUID.randomUUID().toString();
         Long professional = scheduling.createProfessional("Events","Case","CC","P"+suffix,"events-"+suffix+"@example.test","300","hash","PC"+suffix,"LIC"+suffix);
         Long owner = jdbc.queryForObject("select user_id from professionals where id=?",Long.class,professional);
@@ -79,6 +82,18 @@ class AppointmentEventsIntegrationTest extends DatabaseIntegrationSupport {
         SchedulingService.RescheduleRequest reschedule = scheduling.requestReschedule(patient,pending.id(),location,LocalDateTime.of(date,LocalTime.of(9,0)));
         scheduling.decideReschedule(admin,reschedule.id(),"APPROVE",null);
         assertThat(events.events).hasSize(2);
+        assertThat(events.reschedules).hasSize(1);
+        assertThat(events.reschedules.get(0).appointmentId()).isEqualTo(pending.id());
+        assertThat(events.reschedules.get(0).rescheduleRequestId()).isEqualTo(reschedule.id());
+        assertThat(events.reschedules.get(0).decision()).isEqualTo("APPROVED");
+        assertThat(events.reschedules.get(0).actorUserId()).isEqualTo(admin);
+
+        SchedulingService.RescheduleRequest rejected = scheduling.requestReschedule(patient,pending.id(),location,LocalDateTime.of(date,LocalTime.of(9,30)));
+        scheduling.decideReschedule(admin,rejected.id(),"REJECT","Sin disponibilidad");
+        assertThat(events.events).hasSize(2);
+        assertThat(events.reschedules).hasSize(2);
+        assertThat(events.reschedules.get(1).rescheduleRequestId()).isEqualTo(rejected.id());
+        assertThat(events.reschedules.get(1).decision()).isEqualTo("REJECTED");
     }
 
     private Long user(String email,String document) { jdbc.update("insert into users(first_name,last_name,document_type,document_number,email,phone,password_hash,active,email_verified) values ('Test','User','CC',?,?,?,'hash',true,false)",document,email,"300"); return jdbc.queryForObject("select id from users where email=?",Long.class,email); }

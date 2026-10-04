@@ -19,3 +19,15 @@ Los ocho subagentes especializados se mantienen como archivos Markdown versionad
 ## HECHO — 2026-09-22 · Frontend
 
 React es el framework detectado en `citas-web`; deja de ser una pregunta abierta. La aprobación visual y la verificación del incremento auth continúan pendientes de evidencia.
+
+## DECISIÓN — 2026-10-04 · Instancia n8n compartida
+
+La cuenta de n8n entregada por el trainer es compartida por varios estudiantes. Todo workflow y credencial del proyecto lleva el prefijo `Andrey`; no se leen, ejecutan, modifican ni eliminan recursos ajenos. Se genera un acceso MCP propio del proyecto. La credencial Gmail OAuth2 se crea con la cuenta Google personal del estudiante (autorizado por el usuario).
+
+## DECISIÓN — 2026-10-04 · Alcance de WF-002
+
+WF-002 también notifica reprogramaciones aprobadas y rechazadas; para ello la API emite `appointment.reschedule.decided` (ver [Contratos](contracts.md)).
+
+## PREGUNTA ABIERTA — 2026-10-04 · Exposición de la API a n8n
+
+n8n corre en la nube y no alcanza `localhost:8080`. La opción propuesta es un túnel temporal (Cloudflare quick tunnel) abierto solo durante las pruebas controladas. Requiere autorización explícita del usuario en la configuración de permisos, porque expone la API local a Internet (protegida por JWT).

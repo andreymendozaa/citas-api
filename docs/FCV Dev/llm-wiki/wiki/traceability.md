@@ -110,6 +110,10 @@ Con esto, todos los RF funcionales del PRD (RF-01 a RF-19) quedan implementados 
 
 Estado global: 31 `Completada`, 1 `En desarrollo` (HU-004), 1 `En progreso` (HU-033) y 3 `Pendiente de aprobación` (HU-034 a 036, n8n).
 
+**HECHO — 2026-10-04 · S5 backend.** HU-004 pasa a `Completada` y RF-20 queda cubierto: OpenAPI publicado (`/v3/api-docs`, Swagger UI, copia en `docs/openapi/openapi-v1.json`) y verificado por `OpenApiContractIntegrationTest`. El backend de HU-035 está listo: webhook real con eventos de estado y de reprogramación (`N8nWebhookAppointmentEventsTest`, `AppointmentEventsIntegrationTest`). HU-035 sigue `Pendiente de aprobación` hasta construir y validar el workflow.
+
+Estado global: 32 `Completada`, 1 `En progreso` (HU-033) y 3 `Pendiente de aprobación` (HU-034 a 036, n8n).
+
 **HECHO — entorno.** En Docker sobre Windows, el vigilante de archivos de Vite no detecta cambios hechos desde el host. Tras editar `citas-web` hay que reiniciar `npm run dev`, o lanzarlo con sondeo, para verlos en `localhost:5173`.
 
 **PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.

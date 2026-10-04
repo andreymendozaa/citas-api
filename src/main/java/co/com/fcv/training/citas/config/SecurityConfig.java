@@ -44,6 +44,7 @@ class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/actuator/health").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(guard, UsernamePasswordAuthenticationFilter.class)
                 .oauth2ResourceServer(oauth -> oauth

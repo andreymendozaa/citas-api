@@ -155,3 +155,24 @@ Evidencia: `npm run lint`, `npm test` (34/34, incluye `s4Screens.test.tsx`) y `n
 - historial visible como USER, PROFESSIONAL y ADMIN.
 
 HU-008, 009, 010, 012, 013, 029, 030, 031 y 032 pasan a `Completada`, y S4 queda cerrado.
+
+## DECISIÓN — 2026-10-04 · Contrato publicado (HU-004/RF-20) y health
+
+- `GET /v3/api-docs` (OpenAPI 3, springdoc 2.8.13) y Swagger UI (`/swagger-ui/index.html`) son públicos y solo cubren `/api/v1/**`. El esquema `bearerAuth` (JWT) aplica a todas las rutas salvo `/api/v1/auth/**`.
+- Copia versionada del contrato: `citas-api/docs/openapi/openapi-v1.json` (38 rutas al 2026-10-04). Regenerarla tras cada cambio de contrato.
+- `GET /actuator/health` es público y devuelve solo `{"status":"UP|DOWN"}` (`show-details: never`); ningún otro endpoint de Actuator está expuesto.
+- Recordatorio para clientes que no son navegador (n8n): `POST /api/v1/auth/login|refresh|logout` exige `X-Requested-With: XMLHttpRequest`; si se envía `Origin`, debe ser `FRONTEND_ORIGIN`.
+
+## DECISIÓN — 2026-10-04 · Webhook saliente WF-002 (HU-035)
+
+Por decisión del usuario, WF-002 cubre también las decisiones de reprogramación. Contrato del webhook (versión de esquema `1.0`):
+
+- `POST <N8N_STATUS_WEBHOOK_URL>` con `Authorization: Bearer <N8N_STATUS_WEBHOOK_BEARER_TOKEN>` y `Content-Type: application/json`.
+- Campos comunes: `schemaVersion`, `eventId` (UUID, clave de deduplicación), `eventType`, `appointmentId`, `status`, `source`, `occurredAt` (ISO-8601 UTC).
+- `eventType = appointment.status.changed`: añade `previousStatus`. Se emite en la decisión ADMIN de una cita especializada (`REQUESTED → APPROVED|REJECTED`, `source=ADMIN`) y en la cancelación del USER (`→ CANCELLED`, `source=USER`).
+- `eventType = appointment.reschedule.decided`: añade `rescheduleRequestId`; `status = APPROVED|REJECTED` es la decisión sobre la solicitud (la cita sigue `APPROVED`), `source=ADMIN`.
+- Sin PII: no viajan nombres, correos, teléfonos, motivos ni `actorUserId`.
+- Entrega post-commit (`@TransactionalEventListener(AFTER_COMMIT)`) y asíncrona: no bloquea ni hace fallar la petición original. Timeouts de 3 s (conexión) y 5 s (respuesta); 1 reintento ante error de red o 5xx con el mismo `eventId`. Los logs solo registran `eventId` y el código HTTP.
+- Activación por entorno: URL vacía ⇒ `NoOpAppointmentEventsAdapter`; URL sin token ⇒ la API no arranca.
+- Puerto: `Ports.AppointmentEvents` gana `publish(RescheduleDecided)` como método `default` (compatible). `SchedulingJdbcAdapter.decideReschedule` publica `RescheduleDecided`.
+- Pruebas: `N8nWebhookAppointmentEventsTest` (4) y `AppointmentEventsIntegrationTest` ampliada.
