@@ -8,7 +8,7 @@
 - ~~Falta política de zona horaria~~ — resuelto: reloj de negocio `America/Bogota`.
 - ~~(2026-09-30) Cancelación y reprogramación (HU-026 a 028) sin pruebas dedicadas~~ — resuelto el mismo día con `AppointmentLifecycleIntegrationTest`.
 - ~~(2026-09-30) `SchedulingJdbcAdapter.decide` mantiene el patrón `queryForMap` que causaba errores 500~~ — confirmado y corregido el mismo día (`SpecializedDecisionIntegrationTest`). Ya no quedan `queryForMap` en el backend; solo `queryForObject` sobre `count(*)`, que siempre devuelve una fila.
-- (2026-09-30) La base de pruebas Maven es persistente y algunas suites asumen ser las únicas con citas `REQUESTED` (`pending()` con un solo elemento, `$[0]`). Cualquier prueba que deje una solicitud sin resolver rompe a las demás. Conviene hacer esas aserciones independientes de datos ajenos.
+- ~~(2026-09-30) La base de pruebas Maven es persistente y algunas suites asumen ser las únicas con citas `REQUESTED` (`pending()` con un solo elemento, `$[0]`).~~ Resuelto el 2026-10-04 con LOOP_03 (`evidence/LOOP_03-pruebas-fragiles.md`): las aserciones filtran por su propia cita. La suite pasa 2 veces con datos ajenos sembrados (`scripts/loop03-seed-foreign-data.sql`) y ya no los modifica.
 - (2026-09-30) Brechas abiertas:
   - edición de nombre y duración de especialidades en la UI (mejora fuera de los CA de HU-014);
   - OpenAPI (HU-004);

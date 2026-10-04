@@ -224,8 +224,13 @@ class AuthIntegrationTest extends DatabaseIntegrationSupport {
                 """.formatted(professional, location, specialized, date)))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.status").value("REQUESTED"));
         String pending = mvc.perform(get("/api/v1/admin/appointments/pending-specialized").header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk()).andExpect(jsonPath("$[0].durationMinutes").value(60)).andReturn().getResponse().getContentAsString();
-        Long appointment = mapper.readTree(pending).get(0).get("id").asLong();
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        // Other suites may leave pending requests in the persistent test DB: decide only on this test's request.
+        com.fasterxml.jackson.databind.JsonNode own = null;
+        for (var item : mapper.readTree(pending)) if (("Especializada " + suffix).equals(item.get("specialtyName").asText())) own = item;
+        assertThat(own).isNotNull();
+        assertThat(own.get("durationMinutes").asInt()).isEqualTo(60);
+        Long appointment = own.get("id").asLong();
         mvc.perform(post("/api/v1/admin/appointments/{id}/decision", appointment).header("Authorization", "Bearer " + adminToken).contentType(MediaType.APPLICATION_JSON).content("{" + "\"decision\":\"REJECT\",\"reason\":\"Sin disponibilidad\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("REJECTED"));
         mvc.perform(get("/api/v1/appointments/mine").param("status", "REJECTED").header("Authorization", "Bearer " + userToken))

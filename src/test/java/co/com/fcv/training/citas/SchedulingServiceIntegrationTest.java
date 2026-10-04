@@ -34,7 +34,8 @@ class SchedulingServiceIntegrationTest extends DatabaseIntegrationSupport {
         Long patient=user("patient-"+suffix+"@example.test","U"+suffix); Long admin=user("admin-"+suffix+"@example.test","A"+suffix);
         SchedulingService.Appointment appointment=scheduling.reserve(patient,professional,location,specialty,LocalDateTime.of(date,LocalTime.of(8,0)),"Prueba");
         assertThat(appointment.status()).isEqualTo("REQUESTED");
-        assertThat(scheduling.pending()).singleElement().satisfies(pending -> {
+        // The persistent test DB may hold pending requests from other suites: look only at this test's appointment.
+        assertThat(scheduling.pending()).filteredOn(pending -> pending.id().equals(appointment.id())).singleElement().satisfies(pending -> {
             assertThat(pending.id()).isEqualTo(appointment.id());
             assertThat(pending.patientName()).isEqualTo("Test User");
             assertThat(pending.professionalName()).isEqualTo("Pro Fes");
