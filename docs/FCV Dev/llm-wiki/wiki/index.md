@@ -33,7 +33,9 @@ S5 cerrado el 2026-10-04: MCP n8n conectado e invocado desde el agente; análisi
 
 Actualización del 2026-10-04: LOOP_03 ejecutado; HU-033 `Completada` (deuda visual Stitch aceptada). Global 35 de 36.
 
-Siguiente hito: cerrar HU-036 (WF-003 con citas del día) y hacer merge a `main` en los tres repos.
+HU-036 cerrada con un día simulado: **36 de 36 HU `Completada`**.
+
+Siguiente hito: merge `develop → main` en los tres repos y sustentación.
 
 ## Lectura recomendada
 

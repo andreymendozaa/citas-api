@@ -32,8 +32,7 @@ La evidencia de cada CA está en la tabla de cada HU.
 
 | Estado | Cantidad | HU |
 |---|---|---|
-| `Completada` | 35 | HU-001 a HU-035 (HU-004, HU-033, HU-034 y HU-035 cerradas el 2026-10-04; HU-033 con la deuda visual Stitch aceptada) |
-| `En desarrollo` | 1 | HU-036 (WF-003 validado; falta una ejecución con citas del día, CA-01 parcial) |
+| `Completada` | 36 | HU-001 a HU-036. Cerradas el 2026-10-04: HU-004, HU-033 (deuda visual Stitch aceptada), HU-034, HU-035 y HU-036 (día simulado; brecha B4 como mejora futura) |
 
 Actualización del mismo día: HU-026, HU-027 y HU-028 pasan a `Completada` con `AppointmentLifecycleIntegrationTest` (8 casos) y 4 pruebas de cliente. Las pruebas destaparon un bug: se respondía un error 500 ante una cita ajena o inexistente y ante una solicitud ya resuelta; se corrigió siguiendo Red → Green.
 

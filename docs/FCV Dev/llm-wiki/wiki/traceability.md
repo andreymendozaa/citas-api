@@ -128,6 +128,8 @@ Estado global: 34 `Completada`, 1 `En progreso` (HU-033) y 1 `En desarrollo` (HU
 
 Estado global: 35 `Completada` y 1 `En desarrollo` (HU-036, pendiente de una ejecución de WF-003 con citas del día).
 
+**HECHO — 2026-10-04 · HU-036 cerrada.** Con aprobación del usuario se simuló un día operativo con datos sintéticos (`scripts/hu036-simulacion-dia.sql`). WF-003 (#329) agrupó correctamente las citas por sede y especialidad, y los pendientes por tipo. **Estado global: 36 de 36 HU `Completada`.**
+
 **HECHO — entorno.** En Docker sobre Windows, el vigilante de archivos de Vite no detecta cambios hechos desde el host. Tras editar `citas-web` hay que reiniciar `npm run dev`, o lanzarlo con sondeo, para verlos en `localhost:5173`.
 
 **PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.
