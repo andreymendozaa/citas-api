@@ -122,6 +122,12 @@ Estado global: 33 `Completada`, 1 `En progreso` (HU-033) y 2 `Pendiente de aprob
 
 Estado global: 34 `Completada`, 1 `En progreso` (HU-033) y 1 `En desarrollo` (HU-036).
 
+**HECHO — 2026-10-04 · Cierre de HU-033 y LOOP_03.**
+- HU-033 pasa a `Completada`: auditoría de pantallas por rol; lint, Vitest 44/44 y build en verde. La falta de aprobación Stitch/AI Studio se acepta como deuda visual por decisión del usuario.
+- LOOP_03 ejecutado (`evidence/LOOP_03-pruebas-fragiles.md`).
+
+Estado global: 35 `Completada` y 1 `En desarrollo` (HU-036, pendiente de una ejecución de WF-003 con citas del día).
+
 **HECHO — entorno.** En Docker sobre Windows, el vigilante de archivos de Vite no detecta cambios hechos desde el host. Tras editar `citas-web` hay que reiniciar `npm run dev`, o lanzarlo con sondeo, para verlos en `localhost:5173`.
 
 **PREGUNTA ABIERTA.** `RESTRICCIONES_TECNICAS.md` limita a dos repos públicos, y el `AGENTS.md` raíz indica no inicializar Git en la raíz. Sin embargo, `citas` es un repositorio publicado en GitHub. Falta decidir si se documenta como excepción de orquestación o se deja de versionar.

@@ -31,7 +31,9 @@ Actualización del 2026-10-04: WF-001 validado y HU-034 `Completada`; WF-003 eje
 
 S5 cerrado el 2026-10-04: MCP n8n conectado e invocado desde el agente; análisis de contenido no confiable y riesgos residuales en `evidence/S5-MCP-contenido-no-confiable-y-riesgos.md` (ver [Riesgos](risks-open-questions.md)).
 
-Siguiente hito: cierre de HU-033 y HU-036, LOOP_03 y merge a `main`.
+Actualización del 2026-10-04: LOOP_03 ejecutado; HU-033 `Completada` (deuda visual Stitch aceptada). Global 35 de 36.
+
+Siguiente hito: cerrar HU-036 (WF-003 con citas del día) y hacer merge a `main` en los tres repos.
 
 ## Lectura recomendada
 
